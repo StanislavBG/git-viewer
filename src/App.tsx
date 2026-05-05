@@ -1,0 +1,276 @@
+import { useEffect, useState } from 'react';
+import { GitDataProvider, useGitData, useGitDataState } from './data/loader';
+import { useTweaks } from './state/tweaks';
+import { Topbar } from './components/Topbar';
+import { PipelineStrip } from './components/PipelineStrip';
+import { Hero } from './components/Hero';
+import { Heatmap, type HeatmapVariant } from './components/Heatmap';
+import { FocusList } from './components/FocusList';
+import { HoursChart } from './components/HoursChart';
+import { Languages } from './components/Languages';
+import { Themes } from './components/Themes';
+import { RecentFeed } from './components/RecentFeed';
+import { ProjectGrid } from './components/ProjectGrid';
+import { ProjectDetail } from './components/ProjectDetail';
+import { HeadlineStrip } from './components/HeadlineStrip';
+import { Streaks } from './components/Streaks';
+import { TopRepos } from './components/TopRepos';
+import { ProductiveTime } from './components/ProductiveTime';
+import { PrintShell } from './components/PrintShell';
+import {
+  TweaksPanel,
+  TweakSection,
+  TweakSlider,
+  TweakRadio,
+  TweakToggle,
+} from './components/TweaksPanel';
+
+function Shell() {
+  const data = useGitData();
+  const [tw, setTw] = useTweaks();
+  const [view, setView] = useState<'home' | string>('home');
+  const variant: HeatmapVariant = tw.heatmapVariant;
+  const setVariant = (v: HeatmapVariant) => setTw('heatmapVariant', v);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const hue = tw.accentHue;
+    root.style.setProperty('--accent', `oklch(0.78 0.13 ${hue})`);
+    root.style.setProperty('--heat-1', `oklch(0.32 0.04 ${hue})`);
+    root.style.setProperty('--heat-2', `oklch(0.50 0.08 ${hue})`);
+    root.style.setProperty('--heat-3', `oklch(0.68 0.11 ${hue})`);
+    root.style.setProperty('--heat-4', `oklch(0.84 0.14 ${hue})`);
+  }, [tw.accentHue]);
+
+  useEffect(() => {
+    document.body.classList.toggle('density-compact', tw.density === 'compact');
+  }, [tw.density]);
+
+  const onProject = (id: string) => {
+    setView(id);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  const onHome = () => {
+    setView('home');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  return (
+    <>
+      <Topbar onHome={onHome} />
+      {view === 'home' ? (
+        <div className="shell">
+          {tw.showPipeline && <PipelineStrip />}
+          <Hero />
+          <HeadlineStrip />
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Activity</h2>
+              <span className="sub">
+                {data.developer.handle} · 12 months · all projects
+              </span>
+            </div>
+            <Heatmap
+              data={data.heatmap}
+              variant={variant}
+              setVariant={setVariant}
+              allowSwitch={true}
+              totals={{
+                yearCommits: data.totalCommitsYear,
+                commits30: data.commits30,
+                activeDays30: data.activeDays30,
+              }}
+            />
+          </section>
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Last 30 days</h2>
+              <span className="sub">where the work went</span>
+            </div>
+            <div className="focus-grid">
+              <FocusList />
+              <Languages />
+              <HoursChart />
+            </div>
+            <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+              <Streaks />
+              <ProductiveTime />
+            </div>
+            <div style={{ marginTop: 18 }}>
+              <Themes />
+            </div>
+          </section>
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Recent commits</h2>
+              <span className="sub">across all repositories</span>
+            </div>
+            <RecentFeed onProject={onProject} />
+          </section>
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Highlights</h2>
+              <span className="sub">most starred · most active · most forked</span>
+            </div>
+            <TopRepos onProject={onProject} />
+          </section>
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Projects</h2>
+              <span className="sub">
+                {data.projects.length} repositories · click to drill in
+              </span>
+            </div>
+            <ProjectGrid onProject={onProject} />
+          </section>
+
+          <footer
+            style={{
+              marginTop: 60,
+              fontFamily: 'var(--mono)',
+              fontSize: 11,
+              color: 'var(--ink-4)',
+              textAlign: 'center',
+              lineHeight: 1.8,
+            }}
+          >
+            <div>
+              generated by gitoverview · last sync {data.pipeline.lastRun} ·{' '}
+              {data.totalCommitsYear.toLocaleString()} commits indexed
+            </div>
+            <div style={{ marginTop: 10 }}>
+              this is the lab — see the storefront at{' '}
+              <a
+                href="https://bilko.run/projects"
+                style={{ color: 'var(--accent)', textDecoration: 'underline dotted' }}
+              >
+                bilko.run/projects
+              </a>
+              <a
+                className="print-link"
+                onClick={() => {
+                  const u = new URL(window.location.href);
+                  u.searchParams.set('print', '1');
+                  window.location.href = u.toString();
+                }}
+              >
+                ↗ Print
+              </a>
+            </div>
+          </footer>
+        </div>
+      ) : (
+        <ProjectDetail
+          id={view}
+          onBack={onHome}
+          variant={variant}
+          setVariant={setVariant}
+        />
+      )}
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Heatmap">
+          <TweakRadio
+            label="Variant"
+            value={tw.heatmapVariant}
+            onChange={(v) => setTw('heatmapVariant', v)}
+            options={[
+              { value: 'classic', label: 'Grid' },
+              { value: 'extrude', label: '3D' },
+              { value: 'radial', label: 'Radial' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection title="Theme">
+          <TweakSlider
+            label="Accent hue"
+            min={0}
+            max={360}
+            step={1}
+            value={tw.accentHue}
+            onChange={(v) => setTw('accentHue', v)}
+          />
+          <TweakRadio
+            label="Density"
+            value={tw.density}
+            onChange={(v) => setTw('density', v)}
+            options={[
+              { value: 'cozy', label: 'Cozy' },
+              { value: 'compact', label: 'Compact' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection title="Sections">
+          <TweakToggle
+            label="Show pipeline strip"
+            value={tw.showPipeline}
+            onChange={(v) => setTw('showPipeline', v)}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+function isPrintMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('print') === '1';
+}
+
+function DataGate() {
+  const state = useGitDataState();
+  if (state.status === 'loading') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          fontFamily: 'var(--mono)',
+          fontSize: 12,
+          color: 'var(--ink-3)',
+        }}
+      >
+        loading data.json …
+      </div>
+    );
+  }
+  if (state.status === 'error') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          padding: 24,
+          fontFamily: 'var(--mono)',
+          fontSize: 12,
+          color: 'var(--ink-2)',
+          textAlign: 'center',
+        }}
+      >
+        <div>
+          <div style={{ marginBottom: 8 }}>could not load data.json</div>
+          <div style={{ color: 'var(--ink-3)' }}>{state.error}</div>
+          <div style={{ marginTop: 16, color: 'var(--ink-3)' }}>
+            run <span style={{ color: 'var(--accent)' }}>$ pnpm sync</span> to generate it
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return isPrintMode() ? <PrintShell /> : <Shell />;
+}
+
+export function App() {
+  return (
+    <GitDataProvider>
+      <DataGate />
+    </GitDataProvider>
+  );
+}
