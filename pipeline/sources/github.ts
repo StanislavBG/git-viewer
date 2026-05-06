@@ -155,4 +155,57 @@ export class GitHubSource {
       return null;
     }
   }
+
+  // PRD-06. Public events feed: 90-day retention, max 100 per request, no auth
+  // required (works under 60/h unauthenticated; the runner token raises that).
+  async fetchPublicEvents(login: string): Promise<EventRaw[]> {
+    try {
+      const { data } = await this.kit.activity.listPublicEventsForUser({
+        username: login,
+        per_page: 100,
+      });
+      return data as unknown as EventRaw[];
+    } catch {
+      return [];
+    }
+  }
+
+  // PRD-05. Repo tree at HEAD of the default branch. Single recursive call;
+  // GitHub truncates after ~7M entries, which we'll never hit.
+  async fetchTree(
+    owner: string,
+    repo: string,
+    branch: string,
+  ): Promise<TreeEntry[]> {
+    try {
+      const { data } = await this.kit.git.getTree({
+        owner,
+        repo,
+        tree_sha: branch,
+        recursive: 'true',
+      });
+      return (data.tree ?? [])
+        .filter((e): e is TreeEntry => !!e.path && !!e.type)
+        .map((e) => ({
+          path: e.path as string,
+          type: e.type as 'blob' | 'tree',
+          size: e.size ?? 0,
+        }));
+    } catch {
+      return [];
+    }
+  }
+}
+
+export interface EventRaw {
+  type: string | null;
+  repo: { name: string };
+  payload: Record<string, unknown>;
+  created_at: string | null;
+}
+
+export interface TreeEntry {
+  path: string;
+  type: 'blob' | 'tree';
+  size: number;
 }

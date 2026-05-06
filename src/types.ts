@@ -76,6 +76,9 @@ export interface ProjectDetail {
   license: string;
   readme: string;
   commits: RecentCommit[];
+  // PRD-05. Optional: only present when the pipeline could fetch the tree
+  // (skipped in skinny mode).
+  tree?: FileNode;
 }
 
 export interface FocusItem {
@@ -136,6 +139,50 @@ export interface ProductiveTime {
   tz: string;
 }
 
+// PRD-04. Tier numerals: 0 = locked.
+export type AchievementId =
+  | 'pull-shark'
+  | 'starstruck'
+  | 'galaxy-brain'
+  | 'pair-extraordinaire'
+  | 'public-sponsor';
+export interface Achievement {
+  id: AchievementId;
+  label: string;
+  glyph: string;
+  tier: 0 | 1 | 2 | 3 | 4 | 5;
+  value: number;
+  next?: number;
+}
+
+// PRD-05. Per-project file tree, capped at depth 4 in the pipeline.
+export interface FileNode {
+  name: string;
+  path: string;
+  size: number;     // bytes
+  loc?: number;     // approx LOC = size/40
+  lang?: string;    // by extension
+  children?: FileNode[];
+}
+
+// PRD-06.
+export type ActivityType =
+  | 'pr_opened'
+  | 'pr_merged'
+  | 'issue_opened'
+  | 'issue_closed'
+  | 'release'
+  | 'starred'
+  | 'forked'
+  | 'created_repo';
+export interface ActivityEvent {
+  type: ActivityType;
+  repo: string;     // "owner/name"
+  title: string;
+  url?: string;
+  ts: string;       // ISO
+}
+
 export interface GitData {
   developer: Developer;
   projects: Project[];
@@ -155,4 +202,6 @@ export interface GitData {
   streaks: Streaks;
   topRepos: TopRepos;
   productiveTime: ProductiveTime;
+  achievements: Achievement[];
+  activity: ActivityEvent[];
 }

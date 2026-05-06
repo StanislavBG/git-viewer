@@ -5,7 +5,7 @@ import pLimit from 'p-limit';
 
 import { loadConfig } from './config.js';
 import { GitHubSource, type CommitSummary, type RepoSummary } from './sources/github.js';
-import { fetchContributionCalendar } from './sources/github-graphql.js';
+import { fetchContributionCalendar, fetchAchievementCounters } from './sources/github-graphql.js';
 import { buildHeatmap } from './aggregate/heatmap.js';
 import { aggregateLanguages } from './aggregate/languages.js';
 import { buildHoursHistogram } from './aggregate/hours.js';
@@ -16,6 +16,9 @@ import { buildStreaks } from './aggregate/streaks.js';
 import { buildTopRepos } from './aggregate/top-repos.js';
 import { buildProductiveTime } from './aggregate/productive-time.js';
 import { buildHeadline, fetchViewerStats } from './aggregate/headline.js';
+import { buildActivity } from './aggregate/activity.js';
+import { buildAchievements } from './aggregate/achievements.js';
+import { buildTreemap } from './aggregate/treemap.js';
 import { hueForLanguage, relativeWhen, formatDuration } from './util.js';
 import { isAIProject, projectSort } from '../src/util/classify.js';
 import type {
@@ -73,6 +76,20 @@ async function fetchRepoBundle(
     src.fetchLanguages(owner, repo.name),
   ]);
   return { repo, commits, languages };
+}
+
+function topRepoIdsByRecent(
+  bundles: RepoBundle[],
+  recent30Counts: Map<string, number>,
+  n: number,
+): Set<string> {
+  const ranked = [...bundles]
+    .map((b) => ({ id: b.repo.name, score: recent30Counts.get(b.repo.name) ?? 0 }))
+    .sort((a, b) => b.score - a.score)
+    .filter((x) => x.score > 0)
+    .slice(0, n)
+    .map((x) => x.id);
+  return new Set(ranked);
 }
 
 async function main(): Promise<void> {
@@ -230,6 +247,12 @@ async function main(): Promise<void> {
     ),
   );
 
+  // PRD-05: fetch repo trees only for the top-N most-active repos to bound
+  // the API budget — one call per repo. Skinny mode skips entirely.
+  const treemapTargets = skinny
+    ? new Set<string>()
+    : topRepoIdsByRecent(bundles, recent30Counts, 12);
+
   // Project details — per-project heatmap + 5 most recent commits.
   const projectDetails: Record<string, ProjectDetail> = {};
   await Promise.all(
@@ -247,6 +270,12 @@ async function main(): Promise<void> {
           .sort((x, y) => new Date(y.date).getTime() - new Date(x.date).getTime())
           .slice(0, 5);
         const readme = skinny ? '' : (await src.fetchReadme(cfg.user, b.repo.name)) ?? '';
+        const tree = treemapTargets.has(b.repo.name)
+          ? buildTreemap(
+              b.repo.name,
+              await src.fetchTree(cfg.user, b.repo.name, b.repo.defaultBranch),
+            )
+          : undefined;
         projectDetails[b.repo.name] = {
           heatmap: phMap,
           contributors: 1,
@@ -265,6 +294,7 @@ async function main(): Promise<void> {
             add: 0,
             del: 0,
           })),
+          ...(tree ? { tree } : {}),
         };
       }),
     ),
@@ -281,6 +311,16 @@ async function main(): Promise<void> {
   // PRD-01 headline stats (one extra GraphQL call when authed)
   const viewerStats = await fetchViewerStats(cfg.user, cfg.token);
   const headline = buildHeadline(rawUser, repos, totalCommitsYear, viewerStats);
+
+  // PRD-04 achievements (one GraphQL call when authed; REST-derivable parts always run)
+  const counters = await fetchAchievementCounters(cfg.user, cfg.token);
+  const achievements = buildAchievements({
+    repos,
+    commits: allCommits.map((x) => x.commit),
+    counters,
+  });
+  // PRD-06 cross-repo activity feed (public events, no auth required)
+  const activity = buildActivity(await src.fetchPublicEvents(cfg.user));
 
   const elapsedMs = Date.now() - t0;
 
@@ -311,6 +351,8 @@ async function main(): Promise<void> {
     streaks,
     topRepos,
     productiveTime,
+    achievements,
+    activity,
   };
 
   mkdirSync(join(root, 'public'), { recursive: true });

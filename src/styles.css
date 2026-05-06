@@ -1152,3 +1152,34 @@ body.density-compact .hero h1 { font-size: 52px; }
   .hero h1, .detail-hero h1, .print-shell .print-hero h1 { font-size: 36px; }
   a { color: inherit; text-decoration: none; }
 }
+
+/* ─── PRD-04 Achievements ─── */
+.ach-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+.ach-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  font-size: 12px;
+}
+.ach-glyph { font-size: 14px; line-height: 1; }
+.ach-name  { color: var(--ink-2); }
+.ach-tier  {
+  font-family: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+.ach-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+}

@@ -1,5 +1,6 @@
 import { useGitData } from '../data/loader';
 import { Heatmap, type HeatmapVariant } from './Heatmap';
+import { Treemap } from './Treemap';
 
 export function ProjectDetail({
   id,
@@ -131,10 +132,14 @@ export function ProjectDetail({
               ))}
             </div>
           </div>
-          <div className="readme">
-            {det.readme}
-            {`\n\n## Install\n\n    $ npm i ${p.name}\n\n## Why\n\nA quiet tool. Built to last.\n\n## Status\n\n${p.status}. Pull requests welcome.\n`}
-          </div>
+          {det.tree ? (
+            <Treemap tree={det.tree} />
+          ) : (
+            <div className="readme">
+              {det.readme}
+              {`\n\n## Install\n\n    $ npm i ${p.name}\n\n## Why\n\nA quiet tool. Built to last.\n\n## Status\n\n${p.status}. Pull requests welcome.\n`}
+            </div>
+          )}
         </div>
       </section>
     </div>

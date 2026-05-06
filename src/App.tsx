@@ -17,6 +17,8 @@ import { Streaks } from './components/Streaks';
 import { TopRepos } from './components/TopRepos';
 import { ProductiveTime } from './components/ProductiveTime';
 import { PrintShell } from './components/PrintShell';
+import { Achievements } from './components/Achievements';
+import { ActivityFeed } from './components/ActivityFeed';
 import {
   TweaksPanel,
   TweakSection,
@@ -63,6 +65,7 @@ function Shell() {
           {tw.showPipeline && <PipelineStrip />}
           <Hero />
           <HeadlineStrip />
+          <Achievements />
 
           <section className="block">
             <div className="section-head">
@@ -109,6 +112,14 @@ function Shell() {
               <span className="sub">across all repositories</span>
             </div>
             <RecentFeed onProject={onProject} />
+          </section>
+
+          <section className="block">
+            <div className="section-head">
+              <h2>Cross-repo activity</h2>
+              <span className="sub">PRs · issues · releases · stars · 90-day window</span>
+            </div>
+            <ActivityFeed />
           </section>
 
           <section className="block">
