@@ -8,9 +8,18 @@ type State =
 
 const Ctx = createContext<State>({ status: 'loading' });
 
-// `import.meta.env.BASE_URL` resolves to './' (or '/projects/git-viewer/' if
-// the bundle ever moves to an absolute base) — keeps the data URL portable.
+const CANONICAL_DATA_URL = 'https://stanislavbg.github.io/git-viewer/data.json';
+
+// On the canonical host (and during local dev) we read the bundle's own
+// data.json. Other hosts (bilko.run mirror, forks served elsewhere) fetch
+// from the canonical URL so the daily GH-Pages cron is the single source
+// of truth and mirrors never go stale.
 function dataUrl(): string {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isCanonical = host === 'stanislavbg.github.io' || host === 'localhost' || host === '127.0.0.1';
+    if (!isCanonical) return CANONICAL_DATA_URL;
+  }
   const base = import.meta.env.BASE_URL || './';
   return base.endsWith('/') ? `${base}data.json` : `${base}/data.json`;
 }
