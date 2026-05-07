@@ -19,9 +19,13 @@ import { buildHeadline, fetchViewerStats } from './aggregate/headline.js';
 import { buildActivity } from './aggregate/activity.js';
 import { buildAchievements } from './aggregate/achievements.js';
 import { buildTreemap } from './aggregate/treemap.js';
+import { buildAISummaries } from './aggregate/ai-summaries.js';
+import { buildActivityStats } from './aggregate/activity-stats.js';
+import { buildWriting } from './aggregate/writing.js';
 import { hueForLanguage, relativeWhen, formatDuration } from './util.js';
 import { isAIProject, projectSort } from '../src/util/classify.js';
 import type {
+  FileNode,
   GitData,
   Project,
   ProjectDetail,
@@ -322,6 +326,31 @@ async function main(): Promise<void> {
   // PRD-06 cross-repo activity feed (public events, no auth required)
   const activity = buildActivity(await src.fetchPublicEvents(cfg.user));
 
+  // v3.2 — Projects / Activity / Writing tabs
+  const commitsByRepo = new Map(bundles.map((b) => [b.repo.name, b.commits]));
+  const treesByRepo = new Map<string, FileNode | undefined>(
+    Object.entries(projectDetails).map(([id, det]) => [id, det.tree]),
+  );
+  const statusByRepo = new Map(projects.map((p) => [p.id, p.status]));
+  const aiSummaries = buildAISummaries({
+    repos,
+    commitsByRepo,
+    recent30: recent30Counts,
+    treesByRepo,
+    statusByRepo,
+  });
+  const activityStats = buildActivityStats({
+    repos,
+    commits: allCommits.map((x) => x.commit),
+    commitsByRepo,
+    recent30: recent30Counts,
+    treesByRepo,
+    heatmap,
+    productiveTime,
+    streaks,
+  });
+  const writing = buildWriting(root);
+
   const elapsedMs = Date.now() - t0;
 
   const out: GitData = {
@@ -353,6 +382,11 @@ async function main(): Promise<void> {
     productiveTime,
     achievements,
     activity,
+    aiSummaries,
+    activityStats,
+    essays: writing.essays,
+    essaysFeatured: writing.essaysFeatured,
+    now: writing.now,
   };
 
   mkdirSync(join(root, 'public'), { recursive: true });

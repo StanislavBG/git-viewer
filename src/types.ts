@@ -165,6 +165,89 @@ export interface FileNode {
   children?: FileNode[];
 }
 
+// PRD v3.2-projects. Heuristic per-repo summary (no LLM).
+export interface ProjectSummary {
+  tldr: string;
+  vibe: string;
+  grades: {
+    architecture: number;
+    docs: number;
+    tests: number;
+    performance: number;
+    complexity: number;
+  };
+  useCases: string[];
+  strengths: string[];
+  risks: string[];
+  keyFiles: string[];
+  contributorsNote: string;
+  similar: string[];
+}
+
+// PRD v3.2-activity. Funny / interesting cross-repo stats.
+export interface CommitWord {
+  word: string;
+  n: number;
+  hint?: string;
+}
+export interface Curiosity {
+  stat: string;
+  label: string;
+  detail: string;
+}
+export interface FileExt {
+  ext: string;
+  bytes: number;
+  files: number;
+  color: string;
+}
+export interface HotFile {
+  path: string;
+  project: string;
+  touches: number;
+  last: string;
+}
+export interface Award {
+  icon: string;
+  title: string;
+  detail: string;
+}
+export interface ActivityStats {
+  commitWords: CommitWord[];
+  curiosities: Curiosity[];
+  hourDOW: number[][];   // 7 rows × 24 cols
+  fileExts: FileExt[];
+  velocity: number[];    // 52 weeks
+  hotFiles: HotFile[];
+  awards: Award[];
+}
+
+// PRD v3.2-writing.
+export interface Essay {
+  id: string;
+  title: string;
+  deck: string;
+  date: string;
+  read: number;
+  tag: string;
+  words: number;
+  year: number;
+}
+export interface FeaturedEssay extends Essay {
+  publishedAt: string;
+  tags: string[];
+  excerpt: string;
+  pulls: string[];
+  relatedProjects: string[];
+}
+export interface NowReading { title: string; author: string; since: string; }
+export interface NowWriting { title: string; words: number; target: number; progress: number; }
+export interface NowState {
+  reading: NowReading[];
+  writing: NowWriting | null;
+  thinking: string[];
+}
+
 // PRD-06.
 export type ActivityType =
   | 'pr_opened'
@@ -204,4 +287,9 @@ export interface GitData {
   productiveTime: ProductiveTime;
   achievements: Achievement[];
   activity: ActivityEvent[];
+  aiSummaries: Record<string, ProjectSummary>;
+  activityStats: ActivityStats;
+  essays: Essay[];
+  essaysFeatured: FeaturedEssay | null;
+  now: NowState | null;
 }

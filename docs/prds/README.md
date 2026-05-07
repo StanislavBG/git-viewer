@@ -18,5 +18,16 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 
 All v3.0 + v3.1 PRDs landed.
 
+## v3.2 — Tabs
+
+Four-tab top-level nav: **Overview · Projects · Activity · Writing**.
+
+- Overview: existing single-page experience
+- Projects: magazine-grid with heuristic per-repo AI summaries (TLDR · vibe · 5-axis grades · use-cases · strengths/risks)
+- Activity: curiosities grid · hour×DOW heatmap · commit-msg word cloud · file-ext treemap · 52-week velocity · honors
+- Writing: featured essay (drop-cap) · pull quotes · year-grouped archive · "now reading/writing/thinking" trio. Content authored as `content/writing/*.md` with YAML frontmatter; `_now.md` drives the "now" panel.
+
+Routing via URL hash (`#/projects`, `#/activity`, `#/writing`); back/forward preserved.
+
 Each PRD is a self-contained spec with: motivation, data-shape change, pipeline
 work, UI work, acceptance criteria. Read in numerical order.
