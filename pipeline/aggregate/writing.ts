@@ -16,25 +16,33 @@ interface ParsedFront {
 // Hand-rolled YAML-frontmatter parser. Handles:
 //   key: value
 //   key:
-//     - item
-//     - item
+//     - scalar
 //   key:
-//     subkey: value
+//     - sub: value     ← list of objects, with optional follow-on indented sub-fields
+//       sub2: value
+//   key:
+//     subkey: value    ← nested object
 // Nothing fancier; we control the input.
 //
 // O(n) over file content.
+function indentOf(line: string): number {
+  const m = /^(\s*)/.exec(line);
+  return m ? m[1].length : 0;
+}
+
 function parseFrontmatter(src: string): ParsedFront {
   if (!src.startsWith('---')) return { fm: {}, body: src };
   const end = src.indexOf('\n---', 3);
   if (end < 0) return { fm: {}, body: src };
-  const head = src.slice(3, end).trim();
+  const head = src.slice(3, end).replace(/^\n/, '').replace(/\n$/, '');
   const body = src.slice(end + 4).replace(/^\n/, '');
   const lines = head.split('\n');
   const fm: Record<string, unknown> = {};
   let i = 0;
   while (i < lines.length) {
-    const line = lines[i] ?? '';
+    const line = lines[i]!;
     if (!line.trim()) { i++; continue; }
+    if (indentOf(line) !== 0) { i++; continue; }
     const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
     if (!m) { i++; continue; }
     const key = m[1]!;
@@ -44,11 +52,11 @@ function parseFrontmatter(src: string): ParsedFront {
       i++;
       continue;
     }
-    // Block: collect indented lines.
+    // Block: collect contiguous indented lines (>0 indent).
     const block: string[] = [];
     let j = i + 1;
-    while (j < lines.length && /^\s+/.test(lines[j] ?? '')) {
-      block.push(lines[j] ?? '');
+    while (j < lines.length && (lines[j] === '' || indentOf(lines[j]!) > 0)) {
+      block.push(lines[j]!);
       j++;
     }
     fm[key] = parseBlock(block);
@@ -58,11 +66,9 @@ function parseFrontmatter(src: string): ParsedFront {
 }
 
 function parseInlineValue(s: string): unknown {
-  // Quoted string
   if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
     return s.slice(1, -1);
   }
-  // Inline array
   if (s.startsWith('[') && s.endsWith(']')) {
     return s.slice(1, -1).split(',').map((x) => parseInlineValue(x.trim())).filter((x) => x !== '');
   }
@@ -73,42 +79,54 @@ function parseInlineValue(s: string): unknown {
   return s;
 }
 
+// Parse a block of indented lines that follow `key:` at the parent level.
 function parseBlock(lines: string[]): unknown {
-  // Either an array of items or a nested object.
-  const trimmed = lines.map((l) => l.replace(/^\s+/, ''));
-  const isList = trimmed.every((l) => l === '' || l.startsWith('-'));
+  // Strip uniform leading indent so we operate at the block's natural level.
+  const nonEmpty = lines.filter((l) => l.trim() !== '');
+  if (nonEmpty.length === 0) return null;
+  const baseIndent = Math.min(...nonEmpty.map((l) => indentOf(l)));
+  const norm = lines.map((l) => l === '' ? '' : l.slice(baseIndent));
+
+  const firstNonEmpty = norm.find((l) => l !== '') ?? '';
+  const isList = firstNonEmpty.startsWith('- ') || firstNonEmpty === '-';
+
   if (isList) {
     const items: unknown[] = [];
     let i = 0;
-    while (i < trimmed.length) {
-      const cur = trimmed[i] ?? '';
-      if (!cur.startsWith('-')) { i++; continue; }
-      const after = cur.slice(1).trim();
-      if (after.includes(':') && !after.match(/^\d/)) {
-        // Object item; collect this line's k:v plus any following indented lines that are deeper than the list item.
+    while (i < norm.length) {
+      if (norm[i] === '' || !norm[i]!.startsWith('-')) { i++; continue; }
+      const head = norm[i]!.replace(/^-\s*/, '');
+      // Collect indented continuation lines until next list item or end.
+      const cont: string[] = [];
+      let j = i + 1;
+      while (j < norm.length && norm[j] !== '' && !norm[j]!.startsWith('-')) {
+        cont.push(norm[j]!);
+        j++;
+      }
+      // If head is `key: value` or there are continuation lines, build an object.
+      const headKv = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(head);
+      if (headKv || cont.length > 0) {
         const obj: Record<string, unknown> = {};
-        const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(after);
-        if (m && m[2]?.trim()) obj[m[1]!] = parseInlineValue(m[2].trim());
-        let j = i + 1;
-        while (j < trimmed.length && trimmed[j] !== '' && !trimmed[j]!.startsWith('-')) {
-          const sub = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(trimmed[j]!);
-          if (sub) obj[sub[1]!] = parseInlineValue(sub[2]!.trim());
-          j++;
+        if (headKv && headKv[2]?.trim()) obj[headKv[1]!] = parseInlineValue(headKv[2].trim());
+        for (const sub of cont) {
+          const k = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(sub.replace(/^\s+/, ''));
+          if (k) obj[k[1]!] = parseInlineValue(k[2]!.trim());
         }
         items.push(obj);
-        i = j;
       } else {
-        items.push(parseInlineValue(after));
-        i++;
+        items.push(parseInlineValue(head));
       }
+      i = j;
     }
     return items;
   }
-  // Nested object
+
+  // Nested object: collect top-level `key: value` lines.
   const obj: Record<string, unknown> = {};
-  for (const l of trimmed) {
-    const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(l);
-    if (m) obj[m[1]!] = parseInlineValue(m[2]!.trim());
+  for (const l of norm) {
+    if (!l || indentOf(l) > 0) continue;
+    const k = /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(l);
+    if (k) obj[k[1]!] = parseInlineValue(k[2]!.trim());
   }
   return obj;
 }
