@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/emit-manifest.mjs",
     "preview": "vite preview",
     "sync": "tsx pipeline/sync.ts",
     "serve": "tsx pipeline/server.ts",
@@ -18,12 +18,14 @@
   },
   "devDependencies": {
     "@octokit/rest": "^21.0.2",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.7.0",
     "dotenv": "^16.4.5",
     "p-limit": "^6.1.0",
+    "playwright": "^1.60.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
     "vite": "^6.4.2"

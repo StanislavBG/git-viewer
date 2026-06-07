@@ -9,3 +9,8 @@ dist/
 .mcp.json
 .claude/
 <path>
+
+# playwright
+.pw-dist/
+test-results/
+playwright-report/
