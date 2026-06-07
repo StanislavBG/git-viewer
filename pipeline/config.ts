@@ -1,8 +1,14 @@
 import 'dotenv/config';
 
+// Public-facing persona name. The GitHub account (GITHUB_USER) stays the real
+// login so the API sync and repo URLs keep working; only the displayed name is
+// anonymized. Override with GITHUB_DISPLAY_NAME if the persona changes.
+const DEFAULT_DISPLAY_NAME = 'Bilko Bibitkov';
+
 export interface Config {
   user: string;
   token: string | undefined;
+  displayName: string;
 }
 
 export function loadConfig(): Config {
@@ -13,5 +19,6 @@ export function loadConfig(): Config {
     );
   }
   const token = process.env.GITHUB_TOKEN?.trim() || undefined;
-  return { user, token };
+  const displayName = process.env.GITHUB_DISPLAY_NAME?.trim() || DEFAULT_DISPLAY_NAME;
+  return { user, token, displayName };
 }
