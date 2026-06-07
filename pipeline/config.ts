@@ -5,10 +5,16 @@ import 'dotenv/config';
 // anonymized. Override with GITHUB_DISPLAY_NAME if the persona changes.
 const DEFAULT_DISPLAY_NAME = 'Bilko Bibitkov';
 
+// Public-facing role line. Overrides the bio-inferred role so the persona reads
+// as intended regardless of what the GitHub profile says. Override with
+// GITHUB_DISPLAY_ROLE if the persona changes.
+const DEFAULT_DISPLAY_ROLE = 'Solopreneur and farmer in the making';
+
 export interface Config {
   user: string;
   token: string | undefined;
   displayName: string;
+  displayRole: string;
 }
 
 export function loadConfig(): Config {
@@ -20,5 +26,6 @@ export function loadConfig(): Config {
   }
   const token = process.env.GITHUB_TOKEN?.trim() || undefined;
   const displayName = process.env.GITHUB_DISPLAY_NAME?.trim() || DEFAULT_DISPLAY_NAME;
-  return { user, token, displayName };
+  const displayRole = process.env.GITHUB_DISPLAY_ROLE?.trim() || DEFAULT_DISPLAY_ROLE;
+  return { user, token, displayName, displayRole };
 }

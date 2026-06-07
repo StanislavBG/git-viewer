@@ -304,7 +304,7 @@ async function main(): Promise<void> {
     ),
   );
 
-  const developer = buildDeveloper(rawUser, cfg.displayName);
+  const developer = buildDeveloper(rawUser, cfg.displayName, cfg.displayRole);
 
   // PRD-02 streaks (from heatmap)
   const streaks = buildStreaks(heatmap);

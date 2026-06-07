@@ -10,12 +10,12 @@ function inferRole(bio: string | null, company: string | null): string {
   return 'Software engineer';
 }
 
-export function buildDeveloper(raw: DeveloperRaw, displayName?: string): Developer {
+export function buildDeveloper(raw: DeveloperRaw, displayName?: string, displayRole?: string): Developer {
   const joined = raw.createdAt ? raw.createdAt.slice(0, 4) : '';
   return {
     name: displayName ?? raw.name ?? raw.login,
     handle: raw.login,
-    role: inferRole(raw.bio, raw.company),
+    role: displayRole ?? inferRole(raw.bio, raw.company),
     location: raw.location ?? '',
     bio: raw.bio ?? '',
     email: raw.email ?? '',

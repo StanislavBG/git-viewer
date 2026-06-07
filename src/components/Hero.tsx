@@ -28,9 +28,7 @@ export function Hero() {
               R&D log · est. {developer.joined}
             </div>
             <h1>
-              {developer.name.split(' ')[0]}
-              <br />
-              <em>{developer.name.split(' ').slice(1).join(' ') || ''}</em>
+              {developer.name}
             </h1>
             <div className="role">
               <div className="dot-live"></div>
