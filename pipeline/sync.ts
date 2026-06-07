@@ -390,7 +390,14 @@ async function main(): Promise<void> {
   };
 
   mkdirSync(join(root, 'public'), { recursive: true });
-  writeFileSync(join(root, 'public', 'data.json'), JSON.stringify(out, null, 2));
+  // Anonymize the website: the public site must show the persona, never the
+  // real GitHub login. One chokepoint over the whole serialized payload so the
+  // handle, commit messages, and READMEs the dashboard renders are all scrubbed
+  // at once. Case-sensitive on the exact login, so it never touches the
+  // lowercase `stanislavbg.github.io` Pages host. The GitHub account itself
+  // (cfg.user — used for the API and the loader's fetch host) is untouched.
+  const json = JSON.stringify(out, null, 2).split(cfg.user).join(cfg.displayName);
+  writeFileSync(join(root, 'public', 'data.json'), json);
 
   console.log(`✓ public/data.json written (${formatDuration(elapsedMs)})`);
   console.log(`  ${projects.length} projects · ${totalCommitsYear} commits/12mo · ${commits30}/30d`);

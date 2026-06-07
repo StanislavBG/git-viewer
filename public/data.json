@@ -1,7 +1,7 @@
 {
   "developer": {
     "name": "Bilko Bibitkov",
-    "handle": "StanislavBG",
+    "handle": "Bilko Bibitkov",
     "role": "Software engineer",
     "location": "",
     "bio": "",
@@ -26974,7 +26974,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# StackAudit\n\nStandalone SaaS-stack waste finder. Built as a static-path sibling that gets served at **bilko.run/projects/stack-audit/** by the [bilko-run host](https://github.com/StanislavBG/bilko-run).\n\nCalls `bilko.run/api/demos/stack-audit` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/stack-audit/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CrossPromo>`. The host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/stack-audit/` so all assets resolve under that path.\n\n## Files\n\n- `src/StackAuditPage.tsx` — the page (extracted from `~/Projec",
+      "readme": "# StackAudit\n\nStandalone SaaS-stack waste finder. Built as a static-path sibling that gets served at **bilko.run/projects/stack-audit/** by the [bilko-run host](https://github.com/Bilko Bibitkov/bilko-run).\n\nCalls `bilko.run/api/demos/stack-audit` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/stack-audit/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CrossPromo>`. The host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/stack-audit/` so all assets resolve under that path.\n\n## Files\n\n- `src/StackAuditPage.tsx` — the page (extracted from `~/Projec",
       "commits": [
         {
           "sha": "90993e25608d263bc0dd9e95d9bad1d06bc32bd4",
@@ -29018,7 +29018,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# ThreadGrader\n\nStandalone X/Twitter thread viral analyzer. Built as a static-path sibling that gets served at **bilko.run/projects/thread-grader/** by the [Bilko host](https://github.com/StanislavBG/bilko-run).\n\nCalls `bilko.run/api/demos/thread-grader{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/thread-grader/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/thread-grader/` so all",
+      "readme": "# ThreadGrader\n\nStandalone X/Twitter thread viral analyzer. Built as a static-path sibling that gets served at **bilko.run/projects/thread-grader/** by the [Bilko host](https://github.com/Bilko Bibitkov/bilko-run).\n\nCalls `bilko.run/api/demos/thread-grader{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/thread-grader/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/thread-grader/` so all",
       "commits": [
         {
           "sha": "652b3780b57f7962e8bd3790739ce2d6f3f3c2c9",
@@ -30920,7 +30920,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# AdScorer\n\nStandalone platform-specific ad copy grader. Built as a static-path sibling that gets served at **bilko.run/projects/ad-scorer/** by the [bilko-run host](https://github.com/StanislavBG/bilko-run).\n\nCalls `bilko.run/api/demos/ad-scorer{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/ad-scorer/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/ad-scorer/` so all assets resolve",
+      "readme": "# AdScorer\n\nStandalone platform-specific ad copy grader. Built as a static-path sibling that gets served at **bilko.run/projects/ad-scorer/** by the [bilko-run host](https://github.com/Bilko Bibitkov/bilko-run).\n\nCalls `bilko.run/api/demos/ad-scorer{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/ad-scorer/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/ad-scorer/` so all assets resolve",
       "commits": [
         {
           "sha": "2935dccbea4a43fa3370f9b98b122e4b18698a5f",
@@ -38779,7 +38779,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# HeadlineGrader\n\nStandalone 4-framework headline grader. Built as a static-path sibling that gets served at **bilko.run/projects/headline-grader/** by the [bilko-run host](https://github.com/StanislavBG/bilko-run).\n\nCalls `bilko.run/api/demos/headline-grader{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/headline-grader/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/headline-grade",
+      "readme": "# HeadlineGrader\n\nStandalone 4-framework headline grader. Built as a static-path sibling that gets served at **bilko.run/projects/headline-grader/** by the [bilko-run host](https://github.com/Bilko Bibitkov/bilko-run).\n\nCalls `bilko.run/api/demos/headline-grader{,/compare,/generate}` same-origin — Clerk session cookie + JWT travel automatically.\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/headline-grader/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- React 18 + Vite 6 + Tailwind v4. No router. Bundles `@clerk/clerk-react` for SignInButton + JWT bearer auth.\n- Slim local kit (`src/kit.tsx`) for `track()`, `<ToolHero>`, `<ScoreCard>`, `<SectionBreakdown>`, `<CompareLayout>`, `<Rewrites>`, `<CrossPromo>`. Host's full kit lives at `~/Projects/Bilko/src/components/tool-page/`.\n- `useToolApi` (3 endpoints: submit / compare / generate) hooks the standalone to `bilko.run/api` same-origin. Server route stays in the host.\n- Vite `base: /projects/headline-grade",
       "commits": [
         {
           "sha": "5aaf503a6e8264a42e15eaf408acb7655bb1ba79",
@@ -40785,7 +40785,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# Stepproof\n\nMarketing/landing page for **Stepproof** — regression tests for AI pipelines via YAML scenarios. The actual `npx stepproof` CLI lives at [github.com/StanislavBG/stepproof](https://github.com/StanislavBG/stepproof) (or wherever the npm package is published).\n\nThis repo is the static-path sibling that gets served at **bilko.run/projects/stepproof/** by the [bilko-run host](https://github.com/StanislavBG/bilko-run).\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/stepproof/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- Pure static React 18 + Vite 6 + Tailwind v4. No router. No auth. No credits.\n- Calls `track()` for page-view analytics, posting to `bilko.run/api/analytics/event` same-origin.\n- Vite `base: /projects/stepproof/` so all assets resolve under that path.\n\n## Files\n\n- `src/StepproofPage.tsx` — the page (copied from `~/Projects/Bilko/src/pages/StepproofPage.tsx` at extraction time)\n- `src/main.tsx` — mount point\n- `src/index.css` — ",
+      "readme": "# Stepproof\n\nMarketing/landing page for **Stepproof** — regression tests for AI pipelines via YAML scenarios. The actual `npx stepproof` CLI lives at [github.com/Bilko Bibitkov/stepproof](https://github.com/Bilko Bibitkov/stepproof) (or wherever the npm package is published).\n\nThis repo is the static-path sibling that gets served at **bilko.run/projects/stepproof/** by the [bilko-run host](https://github.com/Bilko Bibitkov/bilko-run).\n\n## Build + sync\n\n```bash\npnpm install\npnpm build              # emits dist/\npnpm sync               # copies dist/ to ../Bilko/public/projects/stepproof/\n```\n\nOr, from a Claude session in this repo, use the `bilko-host` MCP — it'll register the project, copy the build output, commit, and push to both remotes for you.\n\n## Architecture\n\n- Pure static React 18 + Vite 6 + Tailwind v4. No router. No auth. No credits.\n- Calls `track()` for page-view analytics, posting to `bilko.run/api/analytics/event` same-origin.\n- Vite `base: /projects/stepproof/` so all assets resolve under that path.\n\n## Files\n\n- `src/StepproofPage.tsx` — the page (copied from `~/Projects/Bilko/src/pages/StepproofPage.tsx` at extraction time)\n- `src/main.tsx` — mount point\n- `src/index.css` — ",
       "commits": [
         {
           "sha": "0af610f9caec9741090f2043027eb4a3924c6987",
@@ -44744,7 +44744,7 @@
         {
           "sha": "5b9073c84739d8efbde090ad6d52e444127e60df",
           "project": "sfdc-prototypes",
-          "msg": "Merge pull request #79 from StanislavBG/claude/update-informatica-branding-BNKGr",
+          "msg": "Merge pull request #79 from Bilko Bibitkov/claude/update-informatica-branding-BNKGr",
           "when": "1mo",
           "add": 0,
           "del": 0
@@ -44752,7 +44752,7 @@
         {
           "sha": "86c9a7bd71f199ae3cc1bb1d3e8df4d54261db12",
           "project": "sfdc-prototypes",
-          "msg": "Merge pull request #78 from StanislavBG/claude/update-informatica-branding-BNKGr",
+          "msg": "Merge pull request #78 from Bilko Bibitkov/claude/update-informatica-branding-BNKGr",
           "when": "1mo",
           "add": 0,
           "del": 0
@@ -44760,7 +44760,7 @@
         {
           "sha": "82cd85c186d10cd3190282477341ed0bed9706f3",
           "project": "sfdc-prototypes",
-          "msg": "Merge pull request #77 from StanislavBG/claude/update-informatica-branding-BNKGr",
+          "msg": "Merge pull request #77 from Bilko Bibitkov/claude/update-informatica-branding-BNKGr",
           "when": "1mo",
           "add": 0,
           "del": 0
@@ -44768,7 +44768,7 @@
         {
           "sha": "486f7b4c3b57ac4266ed4db13499cea26b924d45",
           "project": "sfdc-prototypes",
-          "msg": "Merge pull request #76 from StanislavBG/claude/update-cleanup-ui-fXyCR",
+          "msg": "Merge pull request #76 from Bilko Bibitkov/claude/update-cleanup-ui-fXyCR",
           "when": "1mo",
           "add": 0,
           "del": 0
@@ -44776,7 +44776,7 @@
         {
           "sha": "850123fd552c148f161df0e0530c2260630de281",
           "project": "sfdc-prototypes",
-          "msg": "Merge pull request #75 from StanislavBG/claude/update-cleanup-ui-fXyCR",
+          "msg": "Merge pull request #75 from Bilko Bibitkov/claude/update-cleanup-ui-fXyCR",
           "when": "1mo",
           "add": 0,
           "del": 0
@@ -48877,7 +48877,7 @@
         {
           "sha": "c6d2b81d8043c6e99a4f1ec0c6cd40a26268ba57",
           "project": "provocations",
-          "msg": "Merge pull request #383 from StanislavBG/claude/increase-document-limit-FMvLT",
+          "msg": "Merge pull request #383 from Bilko Bibitkov/claude/increase-document-limit-FMvLT",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -48885,7 +48885,7 @@
         {
           "sha": "2707f02c70161da99003b978bf730906b910242b",
           "project": "provocations",
-          "msg": "Merge pull request #382 from StanislavBG/claude/increase-document-limit-FMvLT",
+          "msg": "Merge pull request #382 from Bilko Bibitkov/claude/increase-document-limit-FMvLT",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -48893,7 +48893,7 @@
         {
           "sha": "49cee72b2f3afaecf49ad5fb77c45af0bab61d6e",
           "project": "provocations",
-          "msg": "Merge pull request #381 from StanislavBG/claude/increase-document-limit-FMvLT",
+          "msg": "Merge pull request #381 from Bilko Bibitkov/claude/increase-document-limit-FMvLT",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -48901,7 +48901,7 @@
         {
           "sha": "530216360babb58ff4de6dd9cc374435bdf13ed2",
           "project": "provocations",
-          "msg": "Merge pull request #380 from StanislavBG/claude/fix-painter-limits-Fa6NN",
+          "msg": "Merge pull request #380 from Bilko Bibitkov/claude/fix-painter-limits-Fa6NN",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -48909,7 +48909,7 @@
         {
           "sha": "67dc74479c4ad8cbc662c5d9060af9ab7b0792db",
           "project": "provocations",
-          "msg": "Merge pull request #379 from StanislavBG/feature/media-metadata-event-bus",
+          "msg": "Merge pull request #379 from Bilko Bibitkov/feature/media-metadata-event-bus",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -50874,7 +50874,7 @@
         {
           "sha": "4ef449edc55b6e59b1e2c06b5cedbc9a44e7c8c4",
           "project": "bilko",
-          "msg": "Merge pull request #178 from StanislavBG/claude/fix-ai-clip-errors-M5hn2",
+          "msg": "Merge pull request #178 from Bilko Bibitkov/claude/fix-ai-clip-errors-M5hn2",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -50882,7 +50882,7 @@
         {
           "sha": "f9780216bc8cccfeb53897a6355fdb580143b6d2",
           "project": "bilko",
-          "msg": "Merge pull request #177 from StanislavBG/claude/fix-ai-clip-errors-M5hn2",
+          "msg": "Merge pull request #177 from Bilko Bibitkov/claude/fix-ai-clip-errors-M5hn2",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -50890,7 +50890,7 @@
         {
           "sha": "b0844bf2ae3d08183400b3325d05451be24f7cb1",
           "project": "bilko",
-          "msg": "Merge pull request #176 from StanislavBG/claude/fix-ai-clip-errors-M5hn2",
+          "msg": "Merge pull request #176 from Bilko Bibitkov/claude/fix-ai-clip-errors-M5hn2",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -50898,7 +50898,7 @@
         {
           "sha": "e82157f3608701b95b5f781f3f17c0befa4a7d3b",
           "project": "bilko",
-          "msg": "Merge pull request #175 from StanislavBG/claude/add-model-selection-persistence-iwViP",
+          "msg": "Merge pull request #175 from Bilko Bibitkov/claude/add-model-selection-persistence-iwViP",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -50906,7 +50906,7 @@
         {
           "sha": "750d8eb8ac925a41e9cdc920b26d1955cd433249",
           "project": "bilko",
-          "msg": "Merge pull request #174 from StanislavBG/claude/add-model-selection-persistence-iwViP",
+          "msg": "Merge pull request #174 from Bilko Bibitkov/claude/add-model-selection-persistence-iwViP",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -52850,7 +52850,7 @@
         {
           "sha": "ee747fc45d68a6646271cd715cc693d71a8eb5d7",
           "project": "QueryFlow",
-          "msg": "Merge pull request #81 from StanislavBG/claude/move-paste-to-schema-qWVDH",
+          "msg": "Merge pull request #81 from Bilko Bibitkov/claude/move-paste-to-schema-qWVDH",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -52858,7 +52858,7 @@
         {
           "sha": "4efdf7421a5d6b53d653454fa6425d34138e177e",
           "project": "QueryFlow",
-          "msg": "Merge pull request #80 from StanislavBG/claude/move-paste-to-schema-qWVDH",
+          "msg": "Merge pull request #80 from Bilko Bibitkov/claude/move-paste-to-schema-qWVDH",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -52866,7 +52866,7 @@
         {
           "sha": "4b85c7b0df400b8b613e8121d56e30eb6747d433",
           "project": "QueryFlow",
-          "msg": "Merge pull request #79 from StanislavBG/claude/move-paste-to-schema-qWVDH",
+          "msg": "Merge pull request #79 from Bilko Bibitkov/claude/move-paste-to-schema-qWVDH",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -52874,7 +52874,7 @@
         {
           "sha": "630e255eda25dcb59b0b2208dedc379b76dbfea5",
           "project": "QueryFlow",
-          "msg": "Merge pull request #78 from StanislavBG/claude/move-paste-to-schema-qWVDH",
+          "msg": "Merge pull request #78 from Bilko Bibitkov/claude/move-paste-to-schema-qWVDH",
           "when": "2mo",
           "add": 0,
           "del": 0
@@ -52882,7 +52882,7 @@
         {
           "sha": "8992ff9e44842c78bf6d782f73e2f437906f22b6",
           "project": "QueryFlow",
-          "msg": "Merge pull request #77 from StanislavBG/claude/fix-sql-upload-large-files-Lmsmd",
+          "msg": "Merge pull request #77 from Bilko Bibitkov/claude/fix-sql-upload-large-files-Lmsmd",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -68109,7 +68109,7 @@
         {
           "sha": "9a28a3e3dbbb185a92d570e604d523c0d1fe4ade",
           "project": "watch-health",
-          "msg": "Merge pull request #2 from StanislavBG/claude/fix-mobile-app-404-W43Nf",
+          "msg": "Merge pull request #2 from Bilko Bibitkov/claude/fix-mobile-app-404-W43Nf",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -68117,7 +68117,7 @@
         {
           "sha": "b5dcb0a874b57f2d63b4e6081e06f3aad93b7d18",
           "project": "watch-health",
-          "msg": "Merge pull request #1 from StanislavBG/claude/garmin-fitness-app-jR8Bw",
+          "msg": "Merge pull request #1 from Bilko Bibitkov/claude/garmin-fitness-app-jR8Bw",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -70001,7 +70001,7 @@
         {
           "sha": "a7363357a72671aa3faba60dde99486821b7c3b7",
           "project": "wordpress-sample-sites",
-          "msg": "Merge pull request #1 from StanislavBG/claude/export-html-wordpress-Dm6eP",
+          "msg": "Merge pull request #1 from Bilko Bibitkov/claude/export-html-wordpress-Dm6eP",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -73801,7 +73801,7 @@
         {
           "sha": "88dddc5c87f1829bddea26222182e62006a713f7",
           "project": "your-news-agency",
-          "msg": "Merge pull request #6 from StanislavBG/claude/improve-news-layout-AKmva",
+          "msg": "Merge pull request #6 from Bilko Bibitkov/claude/improve-news-layout-AKmva",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -73809,7 +73809,7 @@
         {
           "sha": "0849a6ed51ea31bf859c8279a09ac29b84ea4e21",
           "project": "your-news-agency",
-          "msg": "Merge pull request #5 from StanislavBG/claude/debug-search-issue-jOpTe",
+          "msg": "Merge pull request #5 from Bilko Bibitkov/claude/debug-search-issue-jOpTe",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -73817,7 +73817,7 @@
         {
           "sha": "a6cf6a32199e7ff4248dec281ac669f5e8af68cd",
           "project": "your-news-agency",
-          "msg": "Merge pull request #4 from StanislavBG/claude/wire-ui-to-backend-xVVc6",
+          "msg": "Merge pull request #4 from Bilko Bibitkov/claude/wire-ui-to-backend-xVVc6",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -73825,7 +73825,7 @@
         {
           "sha": "f29d9d70cad855387647455a3d65f7a9aaecc145",
           "project": "your-news-agency",
-          "msg": "Merge pull request #3 from StanislavBG/claude/wire-ui-to-backend-xVVc6",
+          "msg": "Merge pull request #3 from Bilko Bibitkov/claude/wire-ui-to-backend-xVVc6",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -73833,7 +73833,7 @@
         {
           "sha": "ddb8c9fffcc3718c5557de053c0a5aa8934d15d7",
           "project": "your-news-agency",
-          "msg": "Merge pull request #2 from StanislavBG/claude/wire-ui-to-backend-xVVc6",
+          "msg": "Merge pull request #2 from Bilko Bibitkov/claude/wire-ui-to-backend-xVVc6",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -75728,7 +75728,7 @@
         {
           "sha": "2fdd22a680deae60f46260df8fa79a2741354fe6",
           "project": "level-up-agency",
-          "msg": "Merge pull request #6 from StanislavBG/claude/complete-call-simulation-vqkyd",
+          "msg": "Merge pull request #6 from Bilko Bibitkov/claude/complete-call-simulation-vqkyd",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -75736,7 +75736,7 @@
         {
           "sha": "cec51e703473ce5b969a1b045d9aec724b3e7060",
           "project": "level-up-agency",
-          "msg": "Merge pull request #5 from StanislavBG/claude/validate-agent-routes-kVh5O",
+          "msg": "Merge pull request #5 from Bilko Bibitkov/claude/validate-agent-routes-kVh5O",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -75744,7 +75744,7 @@
         {
           "sha": "fede8e08f1136bd9f73aa9f4d7d2724639d71141",
           "project": "level-up-agency",
-          "msg": "Merge pull request #4 from StanislavBG/claude/add-conversation-transcript-08Hfr",
+          "msg": "Merge pull request #4 from Bilko Bibitkov/claude/add-conversation-transcript-08Hfr",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -75752,7 +75752,7 @@
         {
           "sha": "7810a7bbfa6f9bfc244fa0d1ae791b0ce373afa3",
           "project": "level-up-agency",
-          "msg": "Merge pull request #3 from StanislavBG/claude/improve-call-practice-ui-78SJd",
+          "msg": "Merge pull request #3 from Bilko Bibitkov/claude/improve-call-practice-ui-78SJd",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -75760,7 +75760,7 @@
         {
           "sha": "f4ec2394244499826d02229fd7ed53c0e88b5c92",
           "project": "level-up-agency",
-          "msg": "Merge pull request #2 from StanislavBG/claude/skills-os-ai-personas-wJk2t",
+          "msg": "Merge pull request #2 from Bilko Bibitkov/claude/skills-os-ai-personas-wJk2t",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -77655,7 +77655,7 @@
         {
           "sha": "7658eccf6ff79a536f98bc4939690c76ce20e92c",
           "project": "Vibe-Index",
-          "msg": "Merge pull request #29 from StanislavBG/claude/add-redirect-link-1KYFM",
+          "msg": "Merge pull request #29 from Bilko Bibitkov/claude/add-redirect-link-1KYFM",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -77663,7 +77663,7 @@
         {
           "sha": "3a7bcb7660bcfaa7224d2f4c8daa4f3ed3d9a809",
           "project": "Vibe-Index",
-          "msg": "Merge pull request #28 from StanislavBG/claude/start-app-testing-RTEu1",
+          "msg": "Merge pull request #28 from Bilko Bibitkov/claude/start-app-testing-RTEu1",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -77671,7 +77671,7 @@
         {
           "sha": "3e47ddae8e21c3c5bcaf4fdc455dc21aff62b274",
           "project": "Vibe-Index",
-          "msg": "Merge pull request #27 from StanislavBG/claude/start-app-testing-RTEu1",
+          "msg": "Merge pull request #27 from Bilko Bibitkov/claude/start-app-testing-RTEu1",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -77679,7 +77679,7 @@
         {
           "sha": "4738a64fc9ad184b63be7500fcd47c50022cba0e",
           "project": "Vibe-Index",
-          "msg": "Merge pull request #26 from StanislavBG/claude/start-app-testing-RTEu1",
+          "msg": "Merge pull request #26 from Bilko Bibitkov/claude/start-app-testing-RTEu1",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -77687,7 +77687,7 @@
         {
           "sha": "01ce8d43d892d05c779c027994ff69434ecafeb6",
           "project": "Vibe-Index",
-          "msg": "Merge pull request #25 from StanislavBG/claude/after-build-setup-pWXaC",
+          "msg": "Merge pull request #25 from Bilko Bibitkov/claude/after-build-setup-pWXaC",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -79639,7 +79639,7 @@
         {
           "sha": "e854c1fb53e238732b8a3d4d0bc885756a17b768",
           "project": "bilko-flow",
-          "msg": "Merge pull request #33 from StanislavBG/revert-32-claude/smart-table-creation-ear37",
+          "msg": "Merge pull request #33 from Bilko Bibitkov/revert-32-claude/smart-table-creation-ear37",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -79655,7 +79655,7 @@
         {
           "sha": "0652d20cf1409e63e22409bbaedf12005dbd1965",
           "project": "bilko-flow",
-          "msg": "Merge pull request #32 from StanislavBG/claude/smart-table-creation-ear37",
+          "msg": "Merge pull request #32 from Bilko Bibitkov/claude/smart-table-creation-ear37",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -81564,7 +81564,7 @@
         {
           "sha": "dca9886d70b92f66943612d81738b7dae95f3eab",
           "project": "Sensei-v8",
-          "msg": "Merge pull request #10 from StanislavBG/claude/rewrite-claude-md-PVlCZ",
+          "msg": "Merge pull request #10 from Bilko Bibitkov/claude/rewrite-claude-md-PVlCZ",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -81572,7 +81572,7 @@
         {
           "sha": "6324648ce270032c5847c6f1514d7d0b117aef55",
           "project": "Sensei-v8",
-          "msg": "Merge pull request #9 from StanislavBG/claude/fix-evolution-ui-progress-UyMWt",
+          "msg": "Merge pull request #9 from Bilko Bibitkov/claude/fix-evolution-ui-progress-UyMWt",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -81580,7 +81580,7 @@
         {
           "sha": "988addc045775194bf45438b0337490454472628",
           "project": "Sensei-v8",
-          "msg": "Merge pull request #8 from StanislavBG/claude/fix-evolution-ui-progress-UyMWt",
+          "msg": "Merge pull request #8 from Bilko Bibitkov/claude/fix-evolution-ui-progress-UyMWt",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -81588,7 +81588,7 @@
         {
           "sha": "fd2d4b21951360f51eafbf97f0012bb61a05921b",
           "project": "Sensei-v8",
-          "msg": "Merge pull request #7 from StanislavBG/claude/enhance-menu-table-fields-eTqdC",
+          "msg": "Merge pull request #7 from Bilko Bibitkov/claude/enhance-menu-table-fields-eTqdC",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -81596,7 +81596,7 @@
         {
           "sha": "1acf63cf36823a3be19c79aa7699fafc5b96c22b",
           "project": "Sensei-v8",
-          "msg": "Merge pull request #6 from StanislavBG/claude/scan-repo-AcDoL",
+          "msg": "Merge pull request #6 from Bilko Bibitkov/claude/scan-repo-AcDoL",
           "when": "4mo",
           "add": 0,
           "del": 0
@@ -85367,7 +85367,7 @@
         "CSS"
       ],
       "license": "MIT",
-      "readme": "# Waterfall Rules Editor\n\nA React-based rule editor that allows you to create, edit, and manage hierarchical rules with support for nested structures and OR operators.\n\n## Features\n\n- Create and manage hierarchical rules\n- Support for nested rule structures\n- OR operator between rules\n- Visual hierarchy to show rule relationships\n- Edit rule descriptions\n- Move rules up/down\n- Nest/Un-nest rules\n- Reset to original ruleset\n\n## Getting Started\n\n### Prerequisites\n\n- Node.js 18.x or later\n- npm 8.x or later\n\n### Installation\n\n1. Clone the repository:\n```bash\ngit clone https://github.com/StanislavBG/Waterfall-Rules.git\ncd Waterfall-Rules\n```\n\n2. Install dependencies:\n```bash\nnpm install\n```\n\n3. Start the development server:\n```bash\n# Start the backend server\n./start-backend.sh\n\n# In a new terminal, start the frontend\n./start-rule-editor.sh\n```\n\nThe application will be available at:\n- Frontend: http://localhost:3000\n- Backend: http://localhost:5000\n\n## Development\n\n- Frontend: React with TypeScript\n- Backend: Node.js with Express\n- UI: Material-UI (MUI)\n- Animations: Framer Motion\n\n## Project Structure\n\n```\n├── src/                    # Frontend source code\n│   ├── components/        # ",
+      "readme": "# Waterfall Rules Editor\n\nA React-based rule editor that allows you to create, edit, and manage hierarchical rules with support for nested structures and OR operators.\n\n## Features\n\n- Create and manage hierarchical rules\n- Support for nested rule structures\n- OR operator between rules\n- Visual hierarchy to show rule relationships\n- Edit rule descriptions\n- Move rules up/down\n- Nest/Un-nest rules\n- Reset to original ruleset\n\n## Getting Started\n\n### Prerequisites\n\n- Node.js 18.x or later\n- npm 8.x or later\n\n### Installation\n\n1. Clone the repository:\n```bash\ngit clone https://github.com/Bilko Bibitkov/Waterfall-Rules.git\ncd Waterfall-Rules\n```\n\n2. Install dependencies:\n```bash\nnpm install\n```\n\n3. Start the development server:\n```bash\n# Start the backend server\n./start-backend.sh\n\n# In a new terminal, start the frontend\n./start-rule-editor.sh\n```\n\nThe application will be available at:\n- Frontend: http://localhost:3000\n- Backend: http://localhost:5000\n\n## Development\n\n- Frontend: React with TypeScript\n- Backend: Node.js with Express\n- UI: Material-UI (MUI)\n- Animations: Framer Motion\n\n## Project Structure\n\n```\n├── src/                    # Frontend source code\n│   ├── components/        # ",
       "commits": []
     },
     "preflight-license": {
@@ -89145,7 +89145,7 @@
         {
           "sha": "20085aab0812041fd938ea9c57a2708f7f260066",
           "project": "greetings-cards",
-          "msg": "Merge pull request #4 from StanislavBG/claude/greeting-card-designer-OIuDz",
+          "msg": "Merge pull request #4 from Bilko Bibitkov/claude/greeting-card-designer-OIuDz",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -89153,7 +89153,7 @@
         {
           "sha": "321a7bf2a3ea3daeb3c65dedc7e3d8f35112d807",
           "project": "greetings-cards",
-          "msg": "Merge pull request #3 from StanislavBG/claude/greeting-card-designer-OIuDz",
+          "msg": "Merge pull request #3 from Bilko Bibitkov/claude/greeting-card-designer-OIuDz",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -89161,7 +89161,7 @@
         {
           "sha": "8c1637cc7da83e119b0439ead1bdff8666ddb3ca",
           "project": "greetings-cards",
-          "msg": "Merge pull request #2 from StanislavBG/claude/greeting-card-designer-OIuDz",
+          "msg": "Merge pull request #2 from Bilko Bibitkov/claude/greeting-card-designer-OIuDz",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -89169,7 +89169,7 @@
         {
           "sha": "c8c4b3e93ef0638b7df794f4342a6c4884e46b97",
           "project": "greetings-cards",
-          "msg": "Merge pull request #1 from StanislavBG/claude/greeting-card-designer-OIuDz",
+          "msg": "Merge pull request #1 from Bilko Bibitkov/claude/greeting-card-designer-OIuDz",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -92932,7 +92932,7 @@
         {
           "sha": "d5ffaa5a337b557c1af4145a2fcb111ebb7c15cc",
           "project": "founder-manager",
-          "msg": "Merge pull request #13 from StanislavBG/claude/metadata-platform-decisions-z4mIp",
+          "msg": "Merge pull request #13 from Bilko Bibitkov/claude/metadata-platform-decisions-z4mIp",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -92940,7 +92940,7 @@
         {
           "sha": "33626e312d0be6f3e88db0a8ec3364967bab5612",
           "project": "founder-manager",
-          "msg": "Merge pull request #12 from StanislavBG/claude/metadata-platform-decisions-z4mIp",
+          "msg": "Merge pull request #12 from Bilko Bibitkov/claude/metadata-platform-decisions-z4mIp",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -92948,7 +92948,7 @@
         {
           "sha": "5431187ecddb53d8746802f0585b0203862a717e",
           "project": "founder-manager",
-          "msg": "Merge pull request #11 from StanislavBG/claude/metadata-platform-decisions-z4mIp",
+          "msg": "Merge pull request #11 from Bilko Bibitkov/claude/metadata-platform-decisions-z4mIp",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -92956,7 +92956,7 @@
         {
           "sha": "fe6cb7ce8c4a409f505cf16efd94561e6f5fcc04",
           "project": "founder-manager",
-          "msg": "Merge pull request #10 from StanislavBG/claude/metadata-platform-decisions-z4mIp",
+          "msg": "Merge pull request #10 from Bilko Bibitkov/claude/metadata-platform-decisions-z4mIp",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -92964,7 +92964,7 @@
         {
           "sha": "e9e7da4fb3495793fcc67d6085da75eced8e448c",
           "project": "founder-manager",
-          "msg": "Merge pull request #9 from StanislavBG/claude/metadata-platform-decisions-z4mIp",
+          "msg": "Merge pull request #9 from Bilko Bibitkov/claude/metadata-platform-decisions-z4mIp",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -94924,7 +94924,7 @@
         "HTML"
       ],
       "license": "—",
-      "readme": "# NPR Podcast Player\n\nAd-free listening experience for NPR podcasts, powered by [bilko-flow](https://github.com/StanislavBG/bilko-flow) workflow orchestration.\n\n## Features\n\n- **Podcast Selection** — Choose from The Indicator, Planet Money, Short Wave, Hidden Brain, Up First\n- **Automatic Ad Skipping** — Detects and auto-skips pre-roll, mid-roll, and post-roll ads\n- **Transcript View** — Fetches and displays NPR transcripts with sponsor mention highlighting\n- **bilko-flow Pipeline** — Visual workflow showing the fetch → parse → transcript → detect → play pipeline\n- **Ad Detection Strategies**:\n  - Transcript-duration analysis (compares transcript word count to audio length)\n  - Heuristic fallback for episodes without transcripts\n\n## Architecture\n\n```\n┌─────────────┐     ┌──────────────┐     ┌────────────────┐\n│  RSS Feed   │────▶│  Parse       │────▶│  Fetch         │\n│  Proxy      │     │  Episodes    │     │  Transcript    │\n└─────────────┘     └──────────────┘     └────────────────┘\n                                                │\n                                         ┌──────▼──────┐\n                                         │  Detect Ad  │\n                                   ",
+      "readme": "# NPR Podcast Player\n\nAd-free listening experience for NPR podcasts, powered by [bilko-flow](https://github.com/Bilko Bibitkov/bilko-flow) workflow orchestration.\n\n## Features\n\n- **Podcast Selection** — Choose from The Indicator, Planet Money, Short Wave, Hidden Brain, Up First\n- **Automatic Ad Skipping** — Detects and auto-skips pre-roll, mid-roll, and post-roll ads\n- **Transcript View** — Fetches and displays NPR transcripts with sponsor mention highlighting\n- **bilko-flow Pipeline** — Visual workflow showing the fetch → parse → transcript → detect → play pipeline\n- **Ad Detection Strategies**:\n  - Transcript-duration analysis (compares transcript word count to audio length)\n  - Heuristic fallback for episodes without transcripts\n\n## Architecture\n\n```\n┌─────────────┐     ┌──────────────┐     ┌────────────────┐\n│  RSS Feed   │────▶│  Parse       │────▶│  Fetch         │\n│  Proxy      │     │  Episodes    │     │  Transcript    │\n└─────────────┘     └──────────────┘     └────────────────┘\n                                                │\n                                         ┌──────▼──────┐\n                                         │  Detect Ad  │\n                                   ",
       "commits": [
         {
           "sha": "a56dcbb0aba4d9b04fea783530bf3afeef143409",
@@ -98740,7 +98740,7 @@
         {
           "sha": "063cdc09989a83c61cbfd9000fc3926d98de325b",
           "project": "parent-academy",
-          "msg": "Merge pull request #3 from StanislavBG/claude/review-401-error-wBWDQ",
+          "msg": "Merge pull request #3 from Bilko Bibitkov/claude/review-401-error-wBWDQ",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -98748,7 +98748,7 @@
         {
           "sha": "b3e0115aea2cae619be4295146b3ed9215404563",
           "project": "parent-academy",
-          "msg": "Merge pull request #2 from StanislavBG/claude/parent-academy-multi-agent-xVRiH",
+          "msg": "Merge pull request #2 from Bilko Bibitkov/claude/parent-academy-multi-agent-xVRiH",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -98756,7 +98756,7 @@
         {
           "sha": "26c3087eee3fcf17fa676a4041f2ef391f0af4fc",
           "project": "parent-academy",
-          "msg": "Merge pull request #1 from StanislavBG/claude/parent-academy-platform-WXLGe",
+          "msg": "Merge pull request #1 from Bilko Bibitkov/claude/parent-academy-platform-WXLGe",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -102640,7 +102640,7 @@
         {
           "sha": "3f401c462c3e3bc297cee814852e2cc582cd88d2",
           "project": "family-frame",
-          "msg": "Merge pull request #35 from StanislavBG/claude/add-design-tiles-home-IeACe",
+          "msg": "Merge pull request #35 from Bilko Bibitkov/claude/add-design-tiles-home-IeACe",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -102648,7 +102648,7 @@
         {
           "sha": "2393a533d991babc4a2279eae7e0bd570c51bc62",
           "project": "family-frame",
-          "msg": "Merge pull request #34 from StanislavBG/claude/add-design-tiles-home-IeACe",
+          "msg": "Merge pull request #34 from Bilko Bibitkov/claude/add-design-tiles-home-IeACe",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -102656,7 +102656,7 @@
         {
           "sha": "721eb60c6dabd9f8b8565938d71d7bf6bde547cb",
           "project": "family-frame",
-          "msg": "Merge pull request #33 from StanislavBG/claude/fix-weather-widget-layout-Js1FH",
+          "msg": "Merge pull request #33 from Bilko Bibitkov/claude/fix-weather-widget-layout-Js1FH",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -102664,7 +102664,7 @@
         {
           "sha": "f6731464f56ccd39018524e9458d72333130442c",
           "project": "family-frame",
-          "msg": "Merge pull request #32 from StanislavBG/claude/redesign-weather-widget-RezEB",
+          "msg": "Merge pull request #32 from Bilko Bibitkov/claude/redesign-weather-widget-RezEB",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -102672,7 +102672,7 @@
         {
           "sha": "65adcf4c1b1aafb3a630a7d1f3ccb69c3436692b",
           "project": "family-frame",
-          "msg": "Merge pull request #31 from StanislavBG/claude/weather-widget-auto-refresh-4EECF",
+          "msg": "Merge pull request #31 from Bilko Bibitkov/claude/weather-widget-auto-refresh-4EECF",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -117909,7 +117909,7 @@
         {
           "sha": "98c87848b976cff2da3f1b15fec98184ccc8354c",
           "project": "broker-assistant",
-          "msg": "Merge pull request #11 from StanislavBG/claude/real-estate-agent-profiles-vEATk",
+          "msg": "Merge pull request #11 from Bilko Bibitkov/claude/real-estate-agent-profiles-vEATk",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -117917,7 +117917,7 @@
         {
           "sha": "2c0e59b97583a881385e38de70e5772309cfbfb0",
           "project": "broker-assistant",
-          "msg": "Merge pull request #10 from StanislavBG/claude/real-estate-agent-profiles-vEATk",
+          "msg": "Merge pull request #10 from Bilko Bibitkov/claude/real-estate-agent-profiles-vEATk",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -117925,7 +117925,7 @@
         {
           "sha": "55523384636cff3e7197d0e79d8179acf67ac4e0",
           "project": "broker-assistant",
-          "msg": "Merge pull request #8 from StanislavBG/claude/real-estate-agent-profiles-vEATk",
+          "msg": "Merge pull request #8 from Bilko Bibitkov/claude/real-estate-agent-profiles-vEATk",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -117933,7 +117933,7 @@
         {
           "sha": "514034ab51c1dd277995974adaef9cca60980da1",
           "project": "broker-assistant",
-          "msg": "Merge pull request #7 from StanislavBG/claude/real-estate-agent-profiles-vEATk",
+          "msg": "Merge pull request #7 from Bilko Bibitkov/claude/real-estate-agent-profiles-vEATk",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -117941,7 +117941,7 @@
         {
           "sha": "874c3067536ce4c7921c78fa31474e86d521c0bf",
           "project": "broker-assistant",
-          "msg": "Merge pull request #6 from StanislavBG/claude/real-estate-agent-profiles-vEATk",
+          "msg": "Merge pull request #6 from Bilko Bibitkov/claude/real-estate-agent-profiles-vEATk",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -119905,7 +119905,7 @@
         {
           "sha": "c23f9f1c005aa04ad25b3b392924e7b35a7f2474",
           "project": "d360-solution-manager-extended",
-          "msg": "Merge pull request #9 from StanislavBG/claude/phase-2-text-only-variant-d1I8u",
+          "msg": "Merge pull request #9 from Bilko Bibitkov/claude/phase-2-text-only-variant-d1I8u",
           "when": "3mo",
           "add": 0,
           "del": 0
@@ -119913,7 +119913,7 @@
         {
           "sha": "f24de71cfc96e16ed4ae971d517520861c4f408b",
           "project": "d360-solution-manager-extended",
-          "msg": "Merge pull request #8 from StanislavBG/claude/claude-md-ml60ypd5vw4umhix-rntyM",
+          "msg": "Merge pull request #8 from Bilko Bibitkov/claude/claude-md-ml60ypd5vw4umhix-rntyM",
           "when": "4mo",
           "add": 0,
           "del": 0
@@ -119921,7 +119921,7 @@
         {
           "sha": "e0e3f485a761c55ee59d82a44a8e2cb5dca1d1de",
           "project": "d360-solution-manager-extended",
-          "msg": "Merge pull request #7 from StanislavBG/claude/claude-md-ml60ypd5vw4umhix-rntyM",
+          "msg": "Merge pull request #7 from Bilko Bibitkov/claude/claude-md-ml60ypd5vw4umhix-rntyM",
           "when": "4mo",
           "add": 0,
           "del": 0
@@ -119929,7 +119929,7 @@
         {
           "sha": "e834349efa9a7624f018742d4b8ed2c7e4468576",
           "project": "d360-solution-manager-extended",
-          "msg": "Merge pull request #6 from StanislavBG/claude/claude-md-ml60ypd5vw4umhix-rntyM",
+          "msg": "Merge pull request #6 from Bilko Bibitkov/claude/claude-md-ml60ypd5vw4umhix-rntyM",
           "when": "4mo",
           "add": 0,
           "del": 0
@@ -119937,7 +119937,7 @@
         {
           "sha": "05daea020acbf0b76a0eee7307fab75bea29e67d",
           "project": "d360-solution-manager-extended",
-          "msg": "Merge pull request #5 from StanislavBG/claude/claude-md-ml60ypd5vw4umhix-rntyM",
+          "msg": "Merge pull request #5 from Bilko Bibitkov/claude/claude-md-ml60ypd5vw4umhix-rntyM",
           "when": "4mo",
           "add": 0,
           "del": 0
