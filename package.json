@@ -21,12 +21,12 @@
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^4.7.0",
     "dotenv": "^16.4.5",
     "p-limit": "^6.1.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
-    "vite": "^5.4.8"
+    "vite": "^6.4.2"
   },
   "packageManager": "pnpm@9.12.0"
 }

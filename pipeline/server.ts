@@ -17,13 +17,27 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const root = dirname(dirname(__filename));
 const PORT = Number(process.env.PORT ?? 5174);
+const HOST = process.env.HOST ?? '127.0.0.1';
 
 let inFlight: Promise<void> | null = null;
 
-function cors(res: ServerResponse): void {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+function cors(res: ServerResponse, origin: string | undefined): void {
+  // Echo back only same-machine origins. Wildcard would let any tab the user
+  // visits hit /dashboard/update via a simple POST and burn GitHub rate budget.
+  // Vary unconditionally: the response depends on Origin whether or not we echo it,
+  // so any intermediary cache must key on it and never replay across origins.
+  res.setHeader('Vary', 'Origin');
+  if (origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+function originOk(req: IncomingMessage): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 }
 
 async function handleStatus(_req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -82,10 +96,15 @@ function handleUpdate(_req: IncomingMessage, res: ServerResponse): void {
 }
 
 const server = createServer((req, res) => {
-  cors(res);
+  cors(res, req.headers.origin);
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return;
+  }
+  if (req.method === 'POST' && !originOk(req)) {
+    res.writeHead(403, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ error: 'cross-origin POST refused' }));
     return;
   }
   if (req.method === 'GET' && req.url === '/pipeline/status') {
@@ -100,8 +119,8 @@ const server = createServer((req, res) => {
   res.end(JSON.stringify({ error: 'not found' }));
 });
 
-server.listen(PORT, () => {
-  console.log(`gitoverview server listening on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`gitoverview server listening on http://${HOST}:${PORT}`);
   console.log('  GET  /pipeline/status      — current sync metadata');
   console.log('  POST /dashboard/update     — re-run pnpm sync (SSE log)');
 });
