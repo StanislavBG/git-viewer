@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       sync_outcome: ${{ steps.sync.outcome }}
+      keepalive_outcome: ${{ steps.keepalive.outcome }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,6 +58,7 @@ jobs:
       # (e.g. a race with another commit to main) must not fail this job
       # and must not skip today's deploy.
       - name: Commit refreshed data.json
+        id: keepalive
         if: steps.sync.outcome == 'success'
         continue-on-error: true
         run: |
@@ -90,11 +92,14 @@ jobs:
     needs: [build, deploy]
     runs-on: ubuntu-24.04
     # A red run here makes GitHub email the owner, so a persistently failing
-    # sync (which would stop keepalive commits) is noticed long before the
-    # 60-day auto-disable.
-    if: always() && needs.build.outputs.sync_outcome == 'failure'
+    # sync or keepalive push (either of which stops resetting the inactivity
+    # timer) is noticed long before the 60-day auto-disable.
+    if: always() && (needs.build.outputs.sync_outcome == 'failure' || needs.build.outputs.keepalive_outcome == 'failure')
     steps:
-      - name: Report sync failure
+      - name: Report sync or keepalive failure
+        env:
+          SYNC: ${{ needs.build.outputs.sync_outcome }}
+          KEEPALIVE: ${{ needs.build.outputs.keepalive_outcome }}
         run: |
-          echo '::error::pnpm sync failed; deployed last committed data.json'
+          echo "::error::sync=$SYNC keepalive=$KEEPALIVE — a failing keepalive push stops resetting the 60-day cron timer"
           exit 1
