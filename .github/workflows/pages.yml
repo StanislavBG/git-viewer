@@ -21,8 +21,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    outputs:
+      sync_outcome: ${{ steps.sync.outcome }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -49,15 +53,19 @@ jobs:
         run: pnpm sync
 
       # Keepalive: committing here resets GitHub's 60-day inactivity timer,
-      # which otherwise auto-disables the scheduled cron.
+      # which otherwise auto-disables the scheduled cron. A rejected push
+      # (e.g. a race with another commit to main) must not fail this job
+      # and must not skip today's deploy.
       - name: Commit refreshed data.json
-        if: steps.sync.outcome == 'success' && github.event_name != 'pull_request'
+        if: steps.sync.outcome == 'success'
+        continue-on-error: true
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add public/data.json
           if git diff --cached --quiet; then echo 'data.json unchanged'; exit 0; fi
           git commit -m 'chore(data): daily sync [skip ci]'
+          git pull --rebase origin main
           git push
 
       - name: Build
@@ -70,10 +78,23 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  sync-alarm:
+    needs: [build, deploy]
+    runs-on: ubuntu-24.04
+    # A red run here makes GitHub email the owner, so a persistently failing
+    # sync (which would stop keepalive commits) is noticed long before the
+    # 60-day auto-disable.
+    if: always() && needs.build.outputs.sync_outcome == 'failure'
+    steps:
+      - name: Report sync failure
+        run: |
+          echo '::error::pnpm sync failed; deployed last committed data.json'
+          exit 1
