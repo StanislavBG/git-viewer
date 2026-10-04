@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -28,13 +28,18 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Sync portfolio data
+        id: sync
+        continue-on-error: true
         env:
           GITHUB_USER: ${{ github.repository_owner }}
           # The per-run GITHUB_TOKEN gives 1000 req/h — plenty for a personal
@@ -42,6 +47,18 @@ jobs:
           # cross-org access.
           GITHUB_TOKEN: ${{ secrets.PORTFOLIO_TOKEN || secrets.GITHUB_TOKEN }}
         run: pnpm sync
+
+      # Keepalive: committing here resets GitHub's 60-day inactivity timer,
+      # which otherwise auto-disables the scheduled cron.
+      - name: Commit refreshed data.json
+        if: steps.sync.outcome == 'success' && github.event_name != 'pull_request'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data.json
+          if git diff --cached --quiet; then echo 'data.json unchanged'; exit 0; fi
+          git commit -m 'chore(data): daily sync [skip ci]'
+          git push
 
       - name: Build
         run: pnpm build
