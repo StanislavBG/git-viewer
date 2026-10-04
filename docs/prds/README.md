@@ -15,6 +15,7 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 | 06  | Cross-repo activity feed (PRs/issues/releases) | 2 | implemented |
 | 07  | Productive-time 7×24 heatmap               | 1 | implemented |
 | 08  | Resume / print mode                        | 1 | implemented |
+| 09  | Maintenance autopilot (cron keepalive, dead-code removal) | — | implemented |
 
 All v3.0 + v3.1 PRDs landed.
 

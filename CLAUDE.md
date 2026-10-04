@@ -23,8 +23,15 @@ Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, 
 - `pnpm typecheck` — `tsc --noEmit` across `src/` + `pipeline/`.
 
 ## Deploy — two lanes, one `dist/`
-1. **GitHub Pages (canonical)** — `StanislavBG/git-viewer`. CI runs sync+build+deploy on push and daily at 09:00 UTC. Uses `secrets.GITHUB_TOKEN` (auto-injected, 1000/h) — no PAT needed for public repos. Set `secrets.PORTFOLIO_TOKEN` if you ever need cross-org reach.
+1. **GitHub Pages (canonical)** — `StanislavBG/git-viewer`. CI runs typecheck+sync+build+deploy on push and daily at 09:00 UTC, and commits the refreshed `public/data.json` back to `main` as a keepalive so the cron never goes dormant. Uses `secrets.GITHUB_TOKEN` (auto-injected, 1000/h) — no PAT needed for public repos. Set `secrets.PORTFOLIO_TOKEN` if you ever need cross-org reach.
 2. **bilko.run/projects/git-viewer/ (mirror)** — copy `dist/` into `~/Projects/Bilko/public/projects/git-viewer/`, register in `Bilko/src/data/standalone-projects.json`, push to both Bilko remotes (`origin` = bilko-run, `content-grade`). Render redeploys ~60–90s. Or use the `bilko-host` MCP via `.mcp.json` (gitignored) — `register_static_project` once, `publish_static_project` each release.
+
+## Maintenance
+- The daily cron commits `public/data.json` back to `main` as `github-actions[bot]` whenever the data changed — expect these commits in history; `git pull` before starting work.
+- This commit exists to reset GitHub's 60-day workflow-inactivity timer; without it the scheduled cron auto-disables itself (`disabled_inactivity`) — this happened on 2026-08-07 and went unnoticed until 2026-10-04.
+- If the site looks stale, check `gh workflow list --all` for a `disabled_inactivity` status.
+- Fix it with `gh workflow enable pages.yml && gh workflow run pages.yml`.
+- A failed `pnpm sync` (`continue-on-error: true`) still lets `pnpm build` + deploy run, so the site redeploys with the last committed `data.json` instead of going dark.
 
 ## Canonical-data convention (important)
 `src/data/loader.tsx` checks `window.location.hostname`. On the canonical host (`stanislavbg.github.io`) and during local dev (`localhost`/`127.0.0.1`), it reads the bundled `data.json`. On any other host, it fetches `https://stanislavbg.github.io/git-viewer/data.json` at runtime. This makes GH Pages the single source of truth — the daily cron refreshes both lanes without re-publishing the Bilko mirror. GH Pages serves the file with `Access-Control-Allow-Origin: *`. When adding a new mirror host, just extend the canonical-host whitelist (or trust the default fallback path).
