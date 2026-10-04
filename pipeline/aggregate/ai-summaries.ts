@@ -7,6 +7,7 @@ interface Inputs {
   recent30: Map<string, number>;
   treesByRepo: Map<string, FileNode | undefined>;
   statusByRepo: Map<string, ProjectStatus>;
+  readmeByRepo: Map<string, string>;
 }
 
 const SKIP_DIR = /(^|\/)(node_modules|dist|build|vendor|\.git|\.cache|coverage|target|\.next)(\/|$)/i;
@@ -32,12 +33,48 @@ function ageMonths(pushedAt: string | undefined, repos: RepoSummary[]): number {
   void repos;
 }
 
-function buildTLDR(repo: RepoSummary): string {
+const HEADING_RE = /^#{1,6}\s/;
+const BADGE_RE = /^!\[|^\[!\[/;
+const HTML_OR_QUOTE_RE = /^[<>]/;
+
+function truncateAtWord(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const slice = text.slice(0, max - 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  const cut = (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trim();
+  return `${cut}…`;
+}
+
+export function readmeLead(readme: string): string {
+  if (!readme) return '';
+  const noFences = readme.replace(/```[\s\S]*?```/g, '');
+  const blocks = noFences.split(/\n\s*\n/);
+  for (const raw of blocks) {
+    const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length === 0) continue;
+    const first = lines[0];
+    if (HEADING_RE.test(first) || BADGE_RE.test(first) || HTML_OR_QUOTE_RE.test(first)) continue;
+
+    let text = lines.join(' ');
+    text = text.replace(/<[^>]+>/g, '');
+    text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    text = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+    text = text.replace(/`([^`]+)`/g, '$1');
+    text = text.replace(/\s+/g, ' ').trim();
+
+    if (text.length >= 20) return truncateAtWord(text, 200);
+  }
+  return '';
+}
+
+function buildTLDR(repo: RepoSummary, readme: string): string {
   const desc = (repo.description ?? '').trim();
   const topics = repo.topics.slice(0, 3).join(', ');
   if (desc.length >= 80) return desc;
   if (desc && topics) return `${desc} Tagged ${topics}.`;
   if (desc) return desc;
+  const lead = readmeLead(readme);
+  if (lead) return lead;
   if (topics) return `A ${repo.language ?? 'small'} project tagged ${topics}.`;
   return `A small ${repo.language ?? ''} project. The repo's description is empty — read the README.`.trim();
 }
@@ -175,7 +212,7 @@ function buildSimilar(repo: RepoSummary, all: RepoSummary[], recent30: Map<strin
 }
 
 export function buildAISummaries({
-  repos, commitsByRepo, recent30, treesByRepo, statusByRepo,
+  repos, commitsByRepo, recent30, treesByRepo, statusByRepo, readmeByRepo,
 }: Inputs): Record<string, ProjectSummary> {
   const out: Record<string, ProjectSummary> = {};
   for (const repo of repos) {
@@ -196,7 +233,7 @@ export function buildAISummaries({
     const sr = buildStrengthsRisks(repo, status, recent30.get(repo.name) ?? 0, grades.tests, hasReadme);
 
     out[repo.name] = {
-      tldr: buildTLDR(repo),
+      tldr: buildTLDR(repo, readmeByRepo.get(repo.name) ?? ''),
       vibe: buildVibe(repo, status),
       grades,
       useCases: buildUseCases(repo),

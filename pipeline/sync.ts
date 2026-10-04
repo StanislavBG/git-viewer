@@ -332,12 +332,14 @@ async function main(): Promise<void> {
     Object.entries(projectDetails).map(([id, det]) => [id, det.tree]),
   );
   const statusByRepo = new Map(projects.map((p) => [p.id, p.status]));
+  const readmeByRepo = new Map(Object.entries(projectDetails).map(([k, v]) => [k, v.readme]));
   const aiSummaries = buildAISummaries({
     repos,
     commitsByRepo,
     recent30: recent30Counts,
     treesByRepo,
     statusByRepo,
+    readmeByRepo,
   });
   const activityStats = buildActivityStats({
     repos,
