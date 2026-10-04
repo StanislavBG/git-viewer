@@ -118,8 +118,6 @@ pnpm sync         # regenerate public/data.json from the GitHub API
 
 ## What's not here (yet)
 
-- A live "/dashboard/update" endpoint — `pnpm sync` is the workhorse; the
-  workflow's daily cron stands in for a hosted refresh.
 - GraphQL contributions (`contributionsCollection`) — REST `/commits` is
   enough and works without a PAT for forkers.
 - Auth, comments, write actions — read-only portfolio.

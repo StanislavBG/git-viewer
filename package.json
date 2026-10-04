@@ -9,7 +9,6 @@
     "build": "vite build && node scripts/emit-manifest.mjs",
     "preview": "vite preview",
     "sync": "tsx pipeline/sync.ts",
-    "serve": "tsx pipeline/server.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

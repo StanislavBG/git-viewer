@@ -17,7 +17,6 @@ export function PipelineStrip() {
         <span>duration {pipeline.duration}</span>
       </div>
       <div className="right">
-        <span>local → /dashboard/update</span>
         <a className="cli">$ pnpm sync</a>
       </div>
     </div>
