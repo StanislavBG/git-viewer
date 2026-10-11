@@ -18,7 +18,7 @@ import { buildTreemap } from './aggregate/treemap.js';
 import { buildAISummaries } from './aggregate/ai-summaries.js';
 import { buildActivityStats } from './aggregate/activity-stats.js';
 import { selectRepos } from './aggregate/select-repos.js';
-import type { WritingOutput } from './aggregate/writing.js';
+import { buildWritingFromFiles, type WritingOutput } from './aggregate/writing.js';
 import { hueForLanguage, relativeWhen, formatDuration } from './util.js';
 import { isAIProject, projectSort } from '../src/util/classify.js';
 import type {
@@ -41,6 +41,7 @@ export type PortfolioSource = Pick<
   | 'fetchReadme'
   | 'fetchTree'
   | 'fetchPublicEvents'
+  | 'fetchMarkdownDir'
 >;
 
 export interface PortfolioOptions {
@@ -50,7 +51,7 @@ export interface PortfolioOptions {
   displayRole?: string;
   maxProjects?: number;
   allowlist?: string[];
-  writing?: WritingOutput;
+  writing?: WritingOutput | 'none' | 'profile-repo';
   log?: (msg: string) => void;
   source?: PortfolioSource;
 }
@@ -383,7 +384,17 @@ export async function buildPortfolio(
     productiveTime,
     streaks,
   });
-  const writing: WritingOutput = opts.writing ?? { essays: [], essaysFeatured: null, now: null };
+  const emptyWriting: WritingOutput = { essays: [], essaysFeatured: null, now: null };
+  let writing: WritingOutput;
+  if (opts.writing === 'profile-repo') {
+    writing = skinny
+      ? emptyWriting
+      : buildWritingFromFiles(await src.fetchMarkdownDir(cfg.user, cfg.user, 'writing'));
+  } else if (opts.writing === undefined || opts.writing === 'none') {
+    writing = emptyWriting;
+  } else {
+    writing = opts.writing;
+  }
 
   const elapsedMs = Date.now() - t0;
 

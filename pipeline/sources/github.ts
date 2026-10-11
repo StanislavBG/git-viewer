@@ -156,6 +156,35 @@ export class GitHubSource {
     }
   }
 
+  async fetchMarkdownDir(
+    owner: string,
+    repo: string,
+    path: string,
+    max = 30,
+  ): Promise<{ name: string; content: string }[]> {
+    try {
+      const { data } = await this.kit.repos.getContent({ owner, repo, path });
+      if (!Array.isArray(data)) return [];
+      const entries = data
+        .filter((e) => e.type === 'file' && e.name.endsWith('.md'))
+        .slice(0, max);
+      const files = await Promise.all(
+        entries.map(async (e) => {
+          const res = await this.kit.repos.getContent({
+            owner,
+            repo,
+            path: e.path,
+            mediaType: { format: 'raw' },
+          });
+          return { name: e.name, content: res.data as unknown as string };
+        }),
+      );
+      return files;
+    } catch {
+      return [];
+    }
+  }
+
   // PRD-06. Public events feed: 90-day retention, max 100 per request, no auth
   // required (works under 60/h unauthenticated; the runner token raises that).
   async fetchPublicEvents(login: string): Promise<EventRaw[]> {

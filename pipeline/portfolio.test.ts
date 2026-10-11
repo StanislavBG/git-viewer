@@ -49,6 +49,7 @@ test('buildPortfolio fetches per-repo data only for selected repos', async () =>
       fetchReadme: async () => null,
       fetchTree: async () => [] as Awaited<ReturnType<PortfolioSource['fetchTree']>>,
       fetchPublicEvents: async () => [],
+      fetchMarkdownDir: async () => [],
     };
 
     const { data, lockedCount } = await buildPortfolio({ user: 'u', maxProjects: 1, source });
@@ -60,4 +61,74 @@ test('buildPortfolio fetches per-repo data only for selected repos', async () =>
   } finally {
     globalThis.fetch = realFetch;
   }
+});
+
+function fakeSource(
+  files: { name: string; content: string }[],
+  calls: unknown[][] = [],
+): PortfolioSource {
+  return {
+    fetchUser: async (login) => ({
+      login,
+      name: null,
+      bio: null,
+      company: null,
+      location: null,
+      email: null,
+      createdAt: '2020-01-01T00:00:00Z',
+      avatarUrl: '',
+      followers: 0,
+      following: 0,
+      publicRepos: 0,
+    }) as Awaited<ReturnType<PortfolioSource['fetchUser']>>,
+    fetchRepos: async () => [],
+    fetchCommits: async () => [],
+    fetchLanguages: async () => ({}),
+    fetchCommitDetail: async () => null,
+    fetchReadme: async () => null,
+    fetchTree: async () => [] as Awaited<ReturnType<PortfolioSource['fetchTree']>>,
+    fetchPublicEvents: async () => [],
+    fetchMarkdownDir: async (...args) => {
+      calls.push(args);
+      return files;
+    },
+  };
+}
+
+async function withNoNetwork<T>(fn: () => Promise<T>): Promise<T> {
+  const realFetch = globalThis.fetch;
+  // Plenty of rate budget so the pipeline is not in skinny mode; every other call fails.
+  globalThis.fetch = ((url: string) =>
+    String(url).endsWith('/rate_limit')
+      ? Promise.resolve(Response.json({ resources: { core: { remaining: 5000 } } }))
+      : Promise.reject(new Error('network disabled'))) as typeof fetch;
+  try {
+    return await fn();
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+test("writing: 'profile-repo' builds essays from the fetched markdown files", async () => {
+  const md = (t: string) => `---\ntitle: ${t}\ndate: 2026-03-04\n---\n\nBody of ${t}.`;
+  const calls: unknown[][] = [];
+  const source = fakeSource(
+    [
+      { name: 'one.md', content: md('One') },
+      { name: 'two.md', content: md('Two') },
+    ],
+    calls,
+  );
+  const { data } = await withNoNetwork(() =>
+    buildPortfolio({ user: 'u', writing: 'profile-repo', source }),
+  );
+  assert.equal(data.essays.length, 2);
+  assert.deepEqual(calls, [['u', 'u', 'writing']]);
+});
+
+test("writing: 'profile-repo' with no files yields zero essays", async () => {
+  const { data } = await withNoNetwork(() =>
+    buildPortfolio({ user: 'u', writing: 'profile-repo', source: fakeSource([]) }),
+  );
+  assert.deepEqual(data.essays, []);
 });
