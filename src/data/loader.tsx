@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { GitData } from '../types';
-import { parseLogin, parseTenantResponse, tenantApiUrl } from './tenant';
+import { parseLogin, parseTenantResponse, rawTenantParam, tenantApiUrl } from './tenant';
 
 export type Tenant = {
   login: string;
@@ -52,6 +52,11 @@ export function GitDataProvider({ children }: { children: ReactNode }) {
     };
 
     const login = parseLogin(window.location.search);
+    const rawLogin = rawTenantParam(window.location.search);
+    if (login === null && rawLogin !== null) {
+      setState({ status: 'not_found', login: rawLogin });
+      return;
+    }
     if (login === null) {
       fetch(dataUrl(), { cache: 'no-cache' })
         .then(async (r) => {

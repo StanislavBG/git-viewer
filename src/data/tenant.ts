@@ -21,6 +21,10 @@ export function parseLogin(search: string): string | null {
   return value;
 }
 
+export function rawTenantParam(search: string): string | null {
+  return new URLSearchParams(search).get('u') || null;
+}
+
 export function tenantApiUrl(login: string, origin: string): string {
   return origin + '/api/git-viewer/u/' + encodeURIComponent(login);
 }
@@ -64,6 +68,12 @@ export function parseTenantResponse(httpStatus: number, body: unknown): TenantRe
       return { status: 'not_found' };
     case 429:
       return { status: 'rate_limited', retryAfterSec: retryAfter(body) };
+    case 503:
+      throw new Error(
+        asRecord(body)?.status === 'unavailable'
+          ? 'Hosted portfolios are temporarily unavailable — try again later'
+          : 'Portfolio generation failed — try again later',
+      );
     default:
       throw new Error(`Hosted API returned unexpected HTTP status ${httpStatus}`);
   }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogin, tenantApiUrl, parseTenantResponse } from './tenant.js';
+import { parseLogin, rawTenantParam, tenantApiUrl, parseTenantResponse } from './tenant.js';
 
 test('parseLogin accepts a valid login', () => {
   assert.equal(parseLogin('?u=StanislavBG'), 'StanislavBG');
@@ -87,4 +87,17 @@ test('200 without data throws', () => {
   assert.throws(() => parseTenantResponse(200, { login: 'octocat', tier: 'free' }), /data/);
   assert.throws(() => parseTenantResponse(200, null), Error);
   assert.throws(() => parseTenantResponse(200, 'nope'), Error);
+});
+
+test('rawTenantParam distinguishes absent from invalid', () => {
+  assert.equal(rawTenantParam(''), null);
+  assert.equal(rawTenantParam('?u='), null);
+  assert.equal(rawTenantParam('?u=-bad'), '-bad');
+  assert.equal(parseLogin('?u=-bad'), null);
+});
+
+test('parseTenantResponse 503 throws for unavailable and error', () => {
+  assert.throws(() => parseTenantResponse(503, { status: 'unavailable' }), /temporarily unavailable/);
+  assert.throws(() => parseTenantResponse(503, { status: 'error' }), /generation failed/);
+  assert.throws(() => parseTenantResponse(503, null), /generation failed/);
 });

@@ -1,36 +1,28 @@
 {
-  "name": "git-viewer",
+  "name": "@bilkobibitkov/git-viewer",
   "version": "0.1.0",
-  "private": true,
-  "description": "Personal GitHub portfolio dashboard — editorial-dark, heatmap-centric, locally-pipelined.",
+  "description": "Build a GitHub portfolio dataset (heatmap, projects, streaks, activity) for any user \u2014 the engine behind git-viewer.",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build && node scripts/emit-manifest.mjs",
-    "preview": "vite preview",
-    "sync": "tsx pipeline/sync.ts",
-    "typecheck": "tsc --noEmit",
-    "build:lib": "tsc -p tsconfig.lib.json"
+  "license": "MIT",
+  "author": "Bilko Bibitkov",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StanislavBG/git-viewer.git"
   },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@octokit/rest": "^21.0.2",
-    "p-limit": "^6.1.0",
-    "dotenv": "^16.4.5"
+  "homepage": "https://github.com/StanislavBG/git-viewer#readme",
+  "bugs": {
+    "url": "https://github.com/StanislavBG/git-viewer/issues"
   },
-  "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "@types/node": "^22.7.4",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.7.0",
-    "playwright": "^1.60.0",
-    "tsx": "^4.19.1",
-    "typescript": "^5.6.2",
-    "vite": "^6.4.2"
+  "keywords": [
+    "bilko",
+    "github",
+    "portfolio",
+    "heatmap",
+    "octokit"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
-  "packageManager": "pnpm@9.12.0",
   "main": "dist-lib/pipeline/index.js",
   "types": "dist-lib/pipeline/index.d.ts",
   "exports": {
@@ -41,6 +33,40 @@
   },
   "files": [
     "dist-lib",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/emit-manifest.mjs",
+    "preview": "vite preview",
+    "sync": "tsx pipeline/sync.ts",
+    "typecheck": "tsc --noEmit",
+    "build:lib": "rm -rf dist-lib && tsc -p tsconfig.lib.json",
+    "test": "node --import tsx --test src/data/tenant.test.ts pipeline/portfolio.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
+    "prepublishOnly": "pnpm typecheck && pnpm test"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.0.2",
+    "p-limit": "^6.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^22.7.4",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "dotenv": "^16.4.5",
+    "playwright": "^1.60.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vite": "^6.4.2"
+  },
+  "packageManager": "pnpm@9.12.0"
 }
