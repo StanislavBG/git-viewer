@@ -43,6 +43,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/emit-manifest.mjs",
+    "build:bilko": "vite build && rm -f dist/data.json dist/data.sample.json && node scripts/emit-manifest.mjs",
     "preview": "vite preview",
     "sync": "tsx pipeline/sync.ts",
     "typecheck": "tsc --noEmit",
@@ -55,7 +56,6 @@
     "p-limit": "^6.1.0"
   },
   "devDependencies": {
-    "@clerk/clerk-js": "^6.39.0",
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",

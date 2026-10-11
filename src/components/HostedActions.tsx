@@ -15,14 +15,40 @@ type ClerkLike = {
   user?: { primaryEmailAddress?: { emailAddress: string } | null } | null;
 };
 
-const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+// Publishable keys are public; defaulting it means a plain `pnpm build` can't ship sign-in disabled.
+const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_live_Y2xlcmsuYmlsa28ucnVuJA';
+// Loaded from the host's Clerk Frontend API at runtime (as bilko host-kit does) — bundling
+// @clerk/clerk-js adds ~830 KB gz and blows the bilko.run publish budget.
+const CLERK_SCRIPT_SRC = `https://${atob(CLERK_KEY.split('_')[2] ?? '').replace(/\$$/, '')}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+
+declare global {
+  interface Window {
+    Clerk?: ClerkLike;
+  }
+}
 
 let clerkPromise: Promise<ClerkLike> | null = null;
 
+function injectClerkScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (window.Clerk) return resolve();
+    const script = document.createElement('script');
+    script.src = CLERK_SCRIPT_SRC;
+    script.setAttribute('data-clerk-publishable-key', CLERK_KEY);
+    script.crossOrigin = 'anonymous';
+    script.addEventListener('load', () => resolve());
+    script.addEventListener('error', () => {
+      script.remove();
+      reject(new Error('Failed to load sign-in'));
+    });
+    document.head.appendChild(script);
+  });
+}
+
 function loadClerk(): Promise<ClerkLike> {
-  if (!CLERK_KEY) return Promise.reject(new Error('Sign-in is not configured'));
-  clerkPromise ??= import('@clerk/clerk-js').then(async ({ Clerk }) => {
-    const clerk = new Clerk(CLERK_KEY) as unknown as ClerkLike;
+  clerkPromise ??= injectClerkScript().then(async () => {
+    const clerk = window.Clerk;
+    if (!clerk) throw new Error('Failed to load sign-in');
     await clerk.load();
     return clerk;
   });

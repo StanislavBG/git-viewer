@@ -11,7 +11,7 @@ portfolio (optionally choosing up to 12 repos on paid), and upgrades to the $5/m
 
 ## Implementation
 - `src/data/claim.ts` — pure request builders + response mappers (tested in `claim.test.ts`).
-- `src/components/HostedActions.tsx` — lazy `import('@clerk/clerk-js')`, only when a tenant (`?u=`) is loaded; key from `VITE_CLERK_PUBLISHABLE_KEY`.
+- `src/components/HostedActions.tsx` — lazily injects `clerk.browser.js` from the key's Clerk Frontend API (`clerk.bilko.run`), only when a tenant (`?u=`) is loaded — never bundled (bilko.run's 200 KB gz publish budget). Key from `VITE_CLERK_PUBLISHABLE_KEY`, defaulting to the public bilko.run `pk_live_…` key.
 - Canonical page and `data.json` path are untouched.
 
 ## Acceptance
