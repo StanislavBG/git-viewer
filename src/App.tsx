@@ -3,6 +3,7 @@ import { GitDataProvider, useGitData, useGitDataState } from './data/loader';
 import { useTweaks } from './state/tweaks';
 import { useRoute } from './state/route';
 import { Topbar } from './components/Topbar';
+import { ClaimBar } from './components/HostedActions';
 import { PipelineStrip } from './components/PipelineStrip';
 import { Hero } from './components/Hero';
 import { Heatmap, type HeatmapVariant } from './components/Heatmap';
@@ -210,6 +211,7 @@ function Shell() {
 
   return (
     <>
+      <ClaimBar />
       <Topbar tab={tab} setTab={setTab} onHome={onHome} />
       {tabBody}
 

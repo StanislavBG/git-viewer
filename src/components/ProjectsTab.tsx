@@ -1,3 +1,4 @@
+import { UpgradeButton } from './HostedActions';
 import { useMemo, useState } from 'react';
 import { useGitData, useTenant } from '../data/loader';
 import type { ProjectStatus } from '../types';
@@ -102,9 +103,7 @@ export function ProjectsTab({ onProject }: { onProject: (id: string) => void }) 
               <div className="name">+{tenant.lockedCount} more projects</div>
             </div>
             <div className="tldr">
-              <a href="https://bilko.run/pricing" target="_blank" rel="noopener noreferrer">
-                Unlock all projects — $5/mo
-              </a>
+              <UpgradeButton />
             </div>
           </div>
         )}

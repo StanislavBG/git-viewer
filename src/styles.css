@@ -1865,3 +1865,9 @@ body.density-compact .hero h1 { font-size: 52px; }
   .essay-row { grid-template-columns: 60px 1fr 60px; }
   .essay-row .tag, .essay-row .read { display: none; }
 }
+
+.claim-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; padding: 8px 16px; font-family: var(--mono); font-size: 12px; color: var(--ink-3); border-bottom: 1px solid var(--line, #2a2a2a); }
+.claim-bar button, .upgrade-btn { font: inherit; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+.claim-bar button:disabled, .upgrade-btn:disabled { opacity: 0.5; cursor: default; }
+.claim-msg.err { color: oklch(0.72 0.12 30); }
+.claim-msg.ok { color: oklch(0.78 0.10 145); }

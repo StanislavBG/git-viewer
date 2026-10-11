@@ -17,6 +17,7 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 | 08  | Resume / print mode                        | 1 | implemented |
 | 09  | Maintenance autopilot (cron keepalive, dead-code removal) | — | implemented |
 | 10  | Hosted multi-user portfolios (bilko.run)   | — | in progress |
+| 11  | Hosted claim + upgrade flow (Clerk, Stripe) | — | implemented |
 
 All v3.0 + v3.1 PRDs landed.
 

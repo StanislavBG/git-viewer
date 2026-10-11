@@ -1,7 +1,7 @@
 {
   "name": "@bilkobibitkov/git-viewer",
   "version": "0.1.0",
-  "description": "Build a GitHub portfolio dataset (heatmap, projects, streaks, activity) for any user \u2014 the engine behind git-viewer.",
+  "description": "Build a GitHub portfolio dataset (heatmap, projects, streaks, activity) for any user — the engine behind git-viewer.",
   "type": "module",
   "license": "MIT",
   "author": "Bilko Bibitkov",
@@ -47,7 +47,7 @@
     "sync": "tsx pipeline/sync.ts",
     "typecheck": "tsc --noEmit",
     "build:lib": "rm -rf dist-lib && tsc -p tsconfig.lib.json",
-    "test": "node --import tsx --test src/data/tenant.test.ts pipeline/portfolio.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
+    "test": "node --import tsx --test src/data/tenant.test.ts src/data/claim.test.ts pipeline/portfolio.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
     "prepublishOnly": "pnpm typecheck && pnpm test"
   },
   "dependencies": {
@@ -55,6 +55,7 @@
     "p-limit": "^6.1.0"
   },
   "devDependencies": {
+    "@clerk/clerk-js": "^6.39.0",
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",
