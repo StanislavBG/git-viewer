@@ -14,3 +14,4 @@ dist/
 .pw-dist/
 test-results/
 playwright-report/
+dist-lib/

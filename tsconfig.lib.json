@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "noEmit": false,
+    "outDir": "dist-lib",
+    "rootDir": "."
+  },
+  "include": ["pipeline/index.ts"],
+  "exclude": ["**/*.test.ts"]
+}
