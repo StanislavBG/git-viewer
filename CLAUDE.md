@@ -21,6 +21,10 @@ Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, 
 - `pnpm sync` — rebuild `public/data.json` from the GitHub API. Reads `.env` (`GITHUB_USER`, optional `GITHUB_TOKEN`).
 - `pnpm build` — emit `dist/`.
 - `pnpm typecheck` — `tsc --noEmit` across `src/` + `pipeline/`.
+- `pnpm test` — node:test unit tests, then `build:lib` + an import check of the compiled `dist-lib/`.
+
+## npm library
+The repo root is also the npm package `@bilkobibitkov/git-viewer` (ESM, `dist-lib/`, entry `pipeline/index.ts`); bilko.run's hosted `?u=` portfolios call its `buildPortfolio`. Only `@octokit/rest` and `p-limit` are runtime `dependencies` — react, dotenv, vite etc. stay in `devDependencies`. Release: bump `version` + `CHANGELOG.md`, push tag `v<ver>`; `release.yml` publishes with provenance via the `NPM_AUTOMATION_TOKEN` repo secret (not set yet — 0.1.0 was published locally).
 
 ## Deploy — two lanes, one `dist/`
 1. **GitHub Pages (canonical)** — `StanislavBG/git-viewer`. CI runs typecheck+sync+build+deploy on push and daily at 09:00 UTC, and commits the refreshed `public/data.json` back to `main` as a keepalive so the cron never goes dormant. Uses `secrets.GITHUB_TOKEN` (auto-injected, 1000/h) — no PAT needed for public repos. Set `secrets.PORTFOLIO_TOKEN` if you ever need cross-org reach.
