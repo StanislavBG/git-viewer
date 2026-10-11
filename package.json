@@ -1,6 +1,6 @@
 {
   "name": "@bilkobibitkov/git-viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build a GitHub portfolio dataset (heatmap, projects, streaks, activity) for any user — the engine behind git-viewer.",
   "type": "module",
   "license": "MIT",

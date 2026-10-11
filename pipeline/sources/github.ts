@@ -39,13 +39,17 @@ export interface DeveloperRaw {
   publicRepos: number;
 }
 
+export const MAX_COMMIT_PAGES = 5;
+
 export class GitHubSource {
   private kit: Octokit;
-  constructor(token: string | undefined) {
-    this.kit = new Octokit({
-      auth: token,
-      userAgent: 'git-viewer/0.1.0',
-    });
+  constructor(token: string | undefined, kit?: Octokit) {
+    this.kit =
+      kit ??
+      new Octokit({
+        auth: token,
+        userAgent: 'git-viewer/0.1.0',
+      });
   }
 
   async fetchUser(login: string): Promise<DeveloperRaw> {
@@ -105,15 +109,25 @@ export class GitHubSource {
     repo: string,
     sinceIso: string,
     authorLogin: string,
+    maxPages: number = MAX_COMMIT_PAGES,
   ): Promise<CommitSummary[]> {
     try {
-      const commits = await this.kit.paginate(this.kit.repos.listCommits, {
-        owner,
-        repo,
-        author: authorLogin,
-        since: sinceIso,
-        per_page: 100,
-      });
+      let pages = 0;
+      const commits = await this.kit.paginate(
+        this.kit.repos.listCommits,
+        {
+          owner,
+          repo,
+          author: authorLogin,
+          since: sinceIso,
+          per_page: 100,
+        },
+        (response, done) => {
+          pages++;
+          if (pages >= maxPages) done();
+          return response.data;
+        },
+      );
       return commits.map((c) => ({
         sha: c.sha,
         date: c.commit.author?.date ?? c.commit.committer?.date ?? '',

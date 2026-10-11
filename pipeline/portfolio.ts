@@ -1,6 +1,6 @@
 import pLimit from 'p-limit';
 
-import { GitHubSource, type CommitSummary, type RepoSummary } from './sources/github.js';
+import { GitHubSource, MAX_COMMIT_PAGES, type CommitSummary, type RepoSummary } from './sources/github.js';
 import { fetchContributionCalendar, fetchAchievementCounters } from './sources/github-graphql.js';
 import { buildHeatmap } from './aggregate/heatmap.js';
 import { aggregateLanguages } from './aggregate/languages.js';
@@ -50,6 +50,7 @@ export interface PortfolioOptions {
   displayName?: string;
   displayRole?: string;
   maxProjects?: number;
+  maxCommitPagesPerRepo?: number;
   allowlist?: string[];
   writing?: WritingOutput | 'none' | 'profile-repo';
   log?: (msg: string) => void;
@@ -94,9 +95,10 @@ async function fetchRepoBundle(
   owner: string,
   repo: RepoSummary,
   sinceIso: string,
+  maxPages: number,
 ): Promise<RepoBundle> {
   const [commits, languages] = await Promise.all([
-    src.fetchCommits(owner, repo.name, sinceIso, owner),
+    src.fetchCommits(owner, repo.name, sinceIso, owner, maxPages),
     src.fetchLanguages(owner, repo.name),
   ]);
   return { repo, commits, languages };
@@ -168,7 +170,7 @@ export async function buildPortfolio(
 
   const limit = pLimit(5);
   const bundles = await Promise.all(
-    repos.map((r) => limit(() => fetchRepoBundle(src, cfg.user, r, sinceIso))),
+    repos.map((r) => limit(() => fetchRepoBundle(src, cfg.user, r, sinceIso, opts.maxCommitPagesPerRepo ?? MAX_COMMIT_PAGES))),
   );
 
   // Aggregate all 12-month commits into a flat array for cross-cutting summaries.
