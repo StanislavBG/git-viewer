@@ -10,7 +10,8 @@ export function Topbar({
   setTab: (t: Tab) => void;
   onHome: () => void;
 }) {
-  const { pipeline } = useGitData();
+  const { pipeline, essays, now } = useGitData();
+  const hasWriting = essays.length > 0 || now !== null;
   const built = new Date(pipeline.emittedAt);
   const builtLabel = built.toLocaleString('en-US', {
     month: 'short',
@@ -32,7 +33,9 @@ export function Topbar({
         <a className={tab === 'overview' ? 'on' : ''} onClick={() => go('overview')}>Overview</a>
         <a className={tab === 'projects' ? 'on' : ''} onClick={() => go('projects')}>Projects</a>
         <a className={tab === 'activity' ? 'on' : ''} onClick={() => go('activity')}>Activity</a>
-        <a className={tab === 'writing' ? 'on' : ''} onClick={() => go('writing')}>Writing</a>
+        {hasWriting && (
+          <a className={tab === 'writing' ? 'on' : ''} onClick={() => go('writing')}>Writing</a>
+        )}
       </nav>
       <div className="meta">
         <span>v0.2.0</span>

@@ -280,6 +280,56 @@ function DataGate() {
       </div>
     );
   }
+  if (state.status === 'generating') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          fontFamily: 'var(--mono)',
+          fontSize: 12,
+          color: 'var(--ink-3)',
+        }}
+      >
+        building @{state.login}’s portfolio …
+      </div>
+    );
+  }
+  if (state.status === 'not_found') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          padding: 24,
+          fontFamily: 'var(--mono)',
+          fontSize: 12,
+          color: 'var(--ink-2)',
+          textAlign: 'center',
+        }}
+      >
+        <div>
+          <div style={{ marginBottom: 16 }}>no GitHub user @{state.login}</div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = String(new FormData(e.currentTarget).get('u') ?? '').trim();
+              if (v) window.location.search = `?u=${encodeURIComponent(v)}`;
+            }}
+          >
+            <input
+              name="u"
+              placeholder="github username"
+              style={{ fontFamily: 'inherit', fontSize: 'inherit', marginRight: 8 }}
+            />
+            <button type="submit">View</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
   if (state.status === 'error') {
     return (
       <div

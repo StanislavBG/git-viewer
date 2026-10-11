@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { useGitData } from '../data/loader';
+import { useGitData, useTenant } from '../data/loader';
 import type { ProjectStatus } from '../types';
 
 const STATUS_OPTIONS: (ProjectStatus | 'all')[] = ['all', 'active', 'maintenance', 'experimental'];
 
 export function ProjectsTab({ onProject }: { onProject: (id: string) => void }) {
   const { projects, aiSummaries } = useGitData();
+  const tenant = useTenant();
   const [status, setStatus] = useState<ProjectStatus | 'all'>('all');
   const [lang, setLang] = useState<string>('all');
 
@@ -95,6 +96,18 @@ export function ProjectsTab({ onProject }: { onProject: (id: string) => void }) 
             </div>
           );
         })}
+        {tenant && tenant.tier === 'free' && tenant.lockedCount > 0 && (
+          <div className="proj-mag">
+            <div className="header">
+              <div className="name">+{tenant.lockedCount} more projects</div>
+            </div>
+            <div className="tldr">
+              <a href="https://bilko.run/pricing" target="_blank" rel="noopener noreferrer">
+                Unlock all projects — $5/mo
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
