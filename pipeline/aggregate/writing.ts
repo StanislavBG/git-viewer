@@ -163,20 +163,33 @@ export interface WritingOutput {
   now: NowState | null;
 }
 
+export interface WritingFile {
+  name: string;
+  content: string;
+}
+
 export function buildWriting(rootDir: string): WritingOutput {
   const dir = join(rootDir, 'content', 'writing');
   if (!existsSync(dir)) {
     return { essays: [], essaysFeatured: null, now: null };
   }
-  const files = readdirSync(dir).filter((f) => f.endsWith('.md') && !f.startsWith('_'));
+  const files = readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((name) => ({ name, content: readFileSync(join(dir, name), 'utf-8') }));
+  return buildWritingFromFiles(files);
+}
 
+export function buildWritingFromFiles(files: WritingFile[]): WritingOutput {
   const essays: Essay[] = [];
+  const isoById = new Map<string, string>();
   let featured: FeaturedEssay | null = null;
+  let nowFile: WritingFile | null = null;
 
   for (const file of files) {
-    const src = readFileSync(join(dir, file), 'utf-8');
-    const { fm, body } = parseFrontmatter(src);
-    const id = file.replace(/\.md$/, '');
+    if (file.name === '_now.md') { nowFile = file; continue; }
+    if (!file.name.endsWith('.md') || file.name.startsWith('_')) continue;
+    const { fm, body } = parseFrontmatter(file.content);
+    const id = file.name.replace(/\.md$/, '');
     const date = asString(fm.date);
     const essay: Essay = {
       id,
@@ -189,6 +202,7 @@ export function buildWriting(rootDir: string): WritingOutput {
       year: yearOf(date),
     };
     essays.push(essay);
+    isoById.set(id, date);
     if (fm.featured === true && !featured) {
       featured = {
         ...essay,
@@ -202,13 +216,16 @@ export function buildWriting(rootDir: string): WritingOutput {
   }
 
   // Sort essays newest-first.
-  essays.sort((a, b) => (a.date < b.date ? 1 : -1));
+  essays.sort((a, b) => {
+    const da = isoById.get(a.id)!;
+    const db = isoById.get(b.id)!;
+    return da < db ? 1 : da > db ? -1 : 0;
+  });
 
   // Now state
   let now: NowState | null = null;
-  const nowPath = join(dir, '_now.md');
-  if (existsSync(nowPath)) {
-    const { fm } = parseFrontmatter(readFileSync(nowPath, 'utf-8'));
+  if (nowFile) {
+    const { fm } = parseFrontmatter(nowFile.content);
     const reading = asArrayOfRecords(fm.reading).map<NowReading>((r) => ({
       title: asString(r.title),
       author: asString(r.author),
