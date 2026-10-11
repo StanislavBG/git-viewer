@@ -1,10 +1,22 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { GitData } from '../types';
+import { parseLogin, parseTenantResponse, tenantApiUrl } from './tenant';
+
+export type Tenant = {
+  login: string;
+  tier: 'free' | 'paid';
+  lockedCount: number;
+  updatedAt: string;
+};
 
 type State =
   | { status: 'loading' }
+  | { status: 'generating'; login: string }
+  | { status: 'not_found'; login: string }
   | { status: 'error'; error: string }
-  | { status: 'ready'; data: GitData };
+  | { status: 'ready'; data: GitData; tenant: Tenant | null };
+
+const MAX_TENANT_ATTEMPTS = 20;
 
 const Ctx = createContext<State>({ status: 'loading' });
 
@@ -29,24 +41,75 @@ export function GitDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(dataUrl(), { cache: 'no-cache' })
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`data.json HTTP ${r.status}`);
-        return (await r.json()) as GitData;
-      })
-      .then((data) => {
-        if (!cancelled) setState({ status: 'ready', data });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setState({
-            status: 'error',
-            error: err instanceof Error ? err.message : String(err),
-          });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const fail = (err: unknown) => {
+      if (!cancelled) {
+        setState({
+          status: 'error',
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    };
+
+    const login = parseLogin(window.location.search);
+    if (login === null) {
+      fetch(dataUrl(), { cache: 'no-cache' })
+        .then(async (r) => {
+          if (!r.ok) throw new Error(`data.json HTTP ${r.status}`);
+          return (await r.json()) as GitData;
+        })
+        .then((data) => {
+          if (!cancelled) setState({ status: 'ready', data, tenant: null });
+        })
+        .catch(fail);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    let attempts = 0;
+    const poll = async () => {
+      attempts += 1;
+      try {
+        const r = await fetch(tenantApiUrl(login, window.location.origin), { cache: 'no-cache' });
+        let body: unknown;
+        try {
+          body = await r.json();
+        } catch {
+          throw new Error(`Hosted API returned a non-JSON body (HTTP ${r.status})`);
         }
-      });
+        if (cancelled) return;
+        const res = parseTenantResponse(r.status, body);
+        if (res.status === 'ready') {
+          setState({
+            status: 'ready',
+            data: res.data,
+            tenant: {
+              login: res.login,
+              tier: res.tier,
+              lockedCount: res.lockedCount,
+              updatedAt: res.updatedAt,
+            },
+          });
+        } else if (res.status === 'not_found') {
+          setState({ status: 'not_found', login });
+        } else {
+          if (attempts >= MAX_TENANT_ATTEMPTS) {
+            setState({ status: 'error', error: 'still generating — try again in a minute' });
+            return;
+          }
+          setState({ status: 'generating', login });
+          timer = setTimeout(() => void poll(), res.retryAfterSec * 1000);
+        }
+      } catch (err) {
+        fail(err);
+      }
+    };
+    void poll();
+
     return () => {
       cancelled = true;
+      if (timer !== undefined) clearTimeout(timer);
     };
   }, []);
 
@@ -63,4 +126,9 @@ export function useGitData(): GitData {
 
 export function useGitDataState(): State {
   return useContext(Ctx);
+}
+
+export function useTenant(): Tenant | null {
+  const s = useContext(Ctx);
+  return s.status === 'ready' ? s.tenant : null;
 }

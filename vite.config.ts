@@ -6,6 +6,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  server: {
+    proxy: {
+      '/api': { target: 'https://bilko.run', changeOrigin: true },
+    },
+  },
   build: {
     target: 'es2022',
     sourcemap: false,
