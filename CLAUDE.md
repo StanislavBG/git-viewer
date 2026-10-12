@@ -38,7 +38,7 @@ The repo root is also the npm package `@bilkobibitkov/git-viewer` (ESM, `dist-li
 - A failed `pnpm sync` (`continue-on-error: true`) still lets `pnpm build` + deploy run, so the site redeploys with the last committed `data.json` instead of going dark.
 
 ## Canonical-data convention (important)
-`src/data/loader.tsx` checks `window.location.hostname`. On the canonical host (`stanislavbg.github.io`) and during local dev (`localhost`/`127.0.0.1`), it reads the bundled `data.json`. On any other host, it fetches `https://stanislavbg.github.io/git-viewer/data.json` at runtime. This makes GH Pages the single source of truth — the daily cron refreshes both lanes without re-publishing the Bilko mirror. GH Pages serves the file with `Access-Control-Allow-Origin: *`. When adding a new mirror host, just extend the canonical-host whitelist (or trust the default fallback path).
+`src/data/loader.tsx` checks `window.location.hostname`. On the canonical host (`stanislavbg.github.io`) and during local dev (`localhost`/`127.0.0.1`), it reads the bundled `data.json`. On any other host, it fetches `https://stanislavbg.github.io/git-viewer/data.json` at runtime. This makes GH Pages the single source of truth — the daily cron refreshes both lanes without re-publishing the Bilko mirror. GH Pages serves the file with `Access-Control-Allow-Origin: *`. When adding a new mirror host, just extend the canonical-host whitelist (or trust the default fallback path). On non-canonical hosts, a URL with no `?u=` renders the landing page (`src/components/Landing.tsx`), while `?landing=1` forces it locally; the owner's portfolio on the mirror is at `?u=StanislavBG`.
 
 ## Conventions
 - TS strict. No comments unless the *why* is non-obvious.

@@ -16,8 +16,9 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 | 07  | Productive-time 7×24 heatmap               | 1 | implemented |
 | 08  | Resume / print mode                        | 1 | implemented |
 | 09  | Maintenance autopilot (cron keepalive, dead-code removal) | — | implemented |
-| 10  | Hosted multi-user portfolios (bilko.run)   | — | in progress |
+| 10  | Hosted multi-user portfolios (bilko.run)   | — | implemented |
 | 11  | Hosted claim + upgrade flow (Clerk, Stripe) | — | implemented |
+| 12  | Self-serve SaaS: landing, repo picker, billing return, résumé CTA | — | in progress |
 
 All v3.0 + v3.1 PRDs landed.
 
