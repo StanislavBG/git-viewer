@@ -1,4 +1,5 @@
-import { useGitData } from '../data/loader';
+import { useEffect, useRef } from 'react';
+import { useGitData, useTenant } from '../data/loader';
 import { Heatmap } from './Heatmap';
 import { HeadlineStrip } from './HeadlineStrip';
 import { Streaks } from './Streaks';
@@ -10,6 +11,13 @@ import { Languages } from './Languages';
 // and the @media print rules in styles.css invert the palette to white.
 export function PrintShell() {
   const data = useGitData();
+  const tenant = useTenant();
+  const printed = useRef(false);
+  useEffect(() => {
+    if (!tenant || printed.current) return;
+    printed.current = true;
+    setTimeout(() => window.print(), 300);
+  }, [tenant]);
   return (
     <div className="shell print-shell">
       <header className="print-hero">
@@ -85,6 +93,11 @@ export function PrintShell() {
         github.com/{data.developer.handle} · products at bilko.run/projects · generated{' '}
         {new Date(data.pipeline.emittedAt).toLocaleDateString()}
       </footer>
+      {tenant && (
+        <footer className="print-footer print-attribution">
+          Portfolio: bilko.run/projects/git-viewer/?u={tenant.login} · made with git-viewer by Bilko
+        </footer>
+      )}
     </div>
   );
 }

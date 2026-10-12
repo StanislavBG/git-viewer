@@ -190,8 +190,18 @@ export function ClaimBar() {
   const { projects } = useGitData();
   const [picking, setPicking] = useState(false);
   if (!h.tenant) return null;
+  const resumeUrl = new URL(window.location.href);
+  resumeUrl.searchParams.set('print', '1');
+  resumeUrl.searchParams.delete('checkout');
   return (
     <div className="claim-bar">
+      <a
+        className="resume-link"
+        href={resumeUrl.toString()}
+        style={{ font: 'inherit', fontWeight: 600, color: 'inherit', textDecoration: 'underline', border: '1px solid currentColor', padding: '2px 10px', borderRadius: 4 }}
+      >
+        Résumé PDF
+      </a>
       <span>Hosted portfolio · {h.tenant.login} · {h.tenant.tier}</span>
       {!h.signedIn ? (
         <button disabled={!h.ready} onClick={h.signIn}>Sign in</button>
