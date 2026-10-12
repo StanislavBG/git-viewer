@@ -3,8 +3,12 @@ import { useTenant } from '../data/loader';
 import {
   buildCheckoutRequest,
   buildClaimRequest,
+  buildPortalRequest,
+  checkoutReturnUrls,
+  parseCheckoutFlag,
   parseCheckoutResponse,
   parseClaimResponse,
+  parsePortalResponse,
 } from '../data/claim';
 
 type ClerkLike = {
@@ -85,6 +89,16 @@ export function useHostedActions() {
     };
   }, [tenant?.login]);
 
+  useEffect(() => {
+    if (!tenant) return;
+    const flag = parseCheckoutFlag(window.location.search);
+    if (flag === 'success') {
+      setMsg({ kind: 'ok', text: 'Payment received — your portfolio switches to Pro within ~5 minutes. Reload to check.' });
+    } else if (flag === 'cancel') {
+      setMsg({ kind: 'ok', text: 'Checkout cancelled — you’re still on the free plan.' });
+    }
+  }, [tenant?.login]);
+
   const signIn = useCallback(() => clerk?.openSignIn(), [clerk]);
 
   const claim = useCallback(async () => {
@@ -126,7 +140,8 @@ export function useHostedActions() {
     setBusy(true);
     setMsg(null);
     try {
-      const req = buildCheckoutRequest({ origin: window.location.origin, email });
+      const { successUrl, cancelUrl } = checkoutReturnUrls(window.location.href);
+      const req = buildCheckoutRequest({ origin: window.location.origin, email, successUrl, cancelUrl });
       const r = await fetch(req.url, req.init);
       const res = parseCheckoutResponse(r.status, await r.json().catch(() => null));
       if (res.status === 'redirect') window.location.assign(res.url);
@@ -138,7 +153,32 @@ export function useHostedActions() {
     }
   }, [clerk]);
 
-  return { tenant, ready: !!clerk, signedIn, busy, msg, signIn, claim, upgrade };
+  const manageBilling = useCallback(async (): Promise<void> => {
+    if (!clerk) return;
+    const email = clerk.user?.primaryEmailAddress?.emailAddress;
+    if (!email) {
+      clerk.openSignIn();
+      return;
+    }
+    setBusy(true);
+    setMsg(null);
+    try {
+      const back = new URL(window.location.href);
+      back.searchParams.delete('checkout');
+      const req = buildPortalRequest({ origin: window.location.origin, email, returnUrl: back.toString() });
+      const r = await fetch(req.url, req.init);
+      const res = parsePortalResponse(r.status, await r.json().catch(() => null));
+      if (res.status === 'redirect') window.location.assign(res.url);
+      else if (res.status === 'no_customer') setMsg({ kind: 'err', text: `No subscription found for ${email}.` });
+      else setMsg({ kind: 'err', text: res.message });
+    } catch (e) {
+      setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
+    } finally {
+      setBusy(false);
+    }
+  }, [clerk]);
+
+  return { tenant, ready: !!clerk, signedIn, busy, msg, signIn, claim, upgrade, manageBilling };
 }
 
 export function ClaimBar() {
@@ -154,6 +194,9 @@ export function ClaimBar() {
           <button disabled={h.busy} onClick={() => void h.claim()}>Claim this portfolio</button>
           {h.tenant.tier === 'free' && (
             <button disabled={h.busy} onClick={() => void h.upgrade()}>Upgrade — $5/mo</button>
+          )}
+          {h.tenant.tier === 'paid' && (
+            <button disabled={h.busy} onClick={() => void h.manageBilling()}>Manage billing</button>
           )}
         </>
       )}
