@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useTenant } from '../data/loader';
+import { useGitData, useTenant } from '../data/loader';
+import { RepoPicker } from './RepoPicker';
 import {
   buildCheckoutRequest,
   buildClaimRequest,
@@ -101,20 +102,22 @@ export function useHostedActions() {
 
   const signIn = useCallback(() => clerk?.openSignIn(), [clerk]);
 
-  const claim = useCallback(async () => {
-    if (!clerk || !tenant) return;
+  const claim = useCallback(async (allowlist?: string[]): Promise<boolean> => {
+    if (!clerk || !tenant) return false;
+    let claimed = false;
     setBusy(true);
     setMsg(null);
     try {
       const token = await clerk.session?.getToken();
       if (!token) {
         clerk.openSignIn();
-        return;
+        return false;
       }
-      const req = buildClaimRequest({ origin: window.location.origin, login: tenant.login, token });
+      const req = buildClaimRequest({ origin: window.location.origin, login: tenant.login, token, allowlist });
       const r = await fetch(req.url, req.init);
       const res = parseClaimResponse(r.status, await r.json().catch(() => null));
       if (res.status === 'claimed') {
+        claimed = true;
         setMsg({ kind: 'ok', text: 'Portfolio claimed. Changes show up within ~5 minutes.' });
       } else if (res.status === 'sign_in_required') {
         clerk.openSignIn();
@@ -128,6 +131,7 @@ export function useHostedActions() {
     } finally {
       setBusy(false);
     }
+    return claimed;
   }, [clerk, tenant]);
 
   const upgrade = useCallback(async () => {
@@ -183,6 +187,8 @@ export function useHostedActions() {
 
 export function ClaimBar() {
   const h = useHostedActions();
+  const { projects } = useGitData();
+  const [picking, setPicking] = useState(false);
   if (!h.tenant) return null;
   return (
     <div className="claim-bar">
@@ -196,11 +202,24 @@ export function ClaimBar() {
             <button disabled={h.busy} onClick={() => void h.upgrade()}>Upgrade — $5/mo</button>
           )}
           {h.tenant.tier === 'paid' && (
-            <button disabled={h.busy} onClick={() => void h.manageBilling()}>Manage billing</button>
+            <>
+              <button disabled={h.busy} onClick={() => setPicking(true)}>Choose projects</button>
+              <button disabled={h.busy} onClick={() => void h.manageBilling()}>Manage billing</button>
+            </>
           )}
         </>
       )}
       {h.msg && <span className={`claim-msg ${h.msg.kind}`}>{h.msg.text}</span>}
+      {picking && (
+        <RepoPicker
+          login={h.tenant.login}
+          initial={projects.map((p) => p.name)}
+          onSave={async (names) => {
+            if (await h.claim(names)) setPicking(false);
+          }}
+          onClose={() => setPicking(false)}
+        />
+      )}
     </div>
   );
 }

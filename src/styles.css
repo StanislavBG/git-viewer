@@ -1910,3 +1910,16 @@ body.density-compact .hero h1 { font-size: 52px; }
   .landing-form { flex-direction: column; }
   .landing-steps, .landing-plans { grid-template-columns: 1fr; }
 }
+
+.repo-picker { position: fixed; inset: 0; margin: auto; width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); height: fit-content; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--line); border-radius: 6px; z-index: 50; box-sizing: border-box; overflow: hidden; }
+.repo-picker-head { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); color: var(--ink); }
+.repo-picker-count { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.repo-picker-body { overflow-y: auto; overflow-x: hidden; padding: 8px 16px; color: var(--ink-2); }
+.repo-picker ul { list-style: none; margin: 0; padding: 0; }
+.repo-picker label { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; padding: 6px 0; cursor: pointer; }
+.repo-picker-name { color: var(--ink); overflow-wrap: anywhere; }
+.repo-picker-stars { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.repo-picker-desc { grid-column: 2 / -1; font-size: 13px; color: var(--ink-3); overflow-wrap: anywhere; }
+.repo-picker h4 { margin: 12px 0 4px; font-family: var(--mono); font-size: 12px; color: var(--ink-3); text-transform: uppercase; }
+.repo-picker-err { color: var(--accent-2); }
+.repo-picker-actions { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line-soft); }
