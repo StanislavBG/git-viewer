@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Landing } from './components/Landing';
+import { isLandingMode } from './data/landing';
 import { GitDataProvider, useGitData, useGitDataState } from './data/loader';
 import { useTweaks } from './state/tweaks';
 import { useRoute } from './state/route';
@@ -360,6 +362,7 @@ function DataGate() {
 }
 
 export function App() {
+  if (isLandingMode(window.location.hostname, window.location.search)) return <Landing />;
   return (
     <GitDataProvider>
       <DataGate />

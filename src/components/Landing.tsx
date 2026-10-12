@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { exampleLogins, normalizeLoginInput } from '../data/landing';
 
@@ -42,6 +42,10 @@ const FAQ: ReadonlyArray<readonly [string, string]> = [
 export function Landing() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Your Git, your Résumé · git-viewer by Bilko';
+  }, []);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
