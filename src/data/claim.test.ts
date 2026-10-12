@@ -6,6 +6,10 @@ import {
   buildCheckoutRequest,
   parseClaimResponse,
   parseCheckoutResponse,
+  checkoutReturnUrls,
+  parseCheckoutFlag,
+  buildPortalRequest,
+  parsePortalResponse,
 } from './claim.js';
 
 test('buildClaimRequest posts login with bearer token', () => {
@@ -64,4 +68,61 @@ test('parseCheckoutResponse returns the redirect url', () => {
   });
   assert.equal(parseCheckoutResponse(200, {}).status, 'error');
   assert.equal(parseCheckoutResponse(500, { url: 'https://a' }).status, 'error');
+});
+
+test('checkoutReturnUrls keeps the path and u param and adds the flag', () => {
+  const r = checkoutReturnUrls('https://bilko.run/projects/git-viewer/?u=octocat');
+  assert.equal(r.successUrl, 'https://bilko.run/projects/git-viewer/?u=octocat&checkout=success');
+  assert.equal(r.cancelUrl, 'https://bilko.run/projects/git-viewer/?u=octocat&checkout=cancel');
+});
+
+test('checkoutReturnUrls replaces an existing checkout param and strips the hash', () => {
+  const r = checkoutReturnUrls('https://bilko.run/p/?checkout=cancel&u=octocat#/projects');
+  assert.equal(r.successUrl, 'https://bilko.run/p/?u=octocat&checkout=success');
+  assert.equal(r.cancelUrl, 'https://bilko.run/p/?u=octocat&checkout=cancel');
+});
+
+test('buildCheckoutRequest includes return urls only when given', () => {
+  const r = buildCheckoutRequest({
+    origin: 'https://bilko.run',
+    email: 'me@x.io',
+    successUrl: 'https://bilko.run/a?checkout=success',
+    cancelUrl: 'https://bilko.run/a?checkout=cancel',
+  });
+  assert.deepEqual(JSON.parse(r.init.body as string), {
+    email: 'me@x.io',
+    priceType: 'git_viewer',
+    successUrl: 'https://bilko.run/a?checkout=success',
+    cancelUrl: 'https://bilko.run/a?checkout=cancel',
+  });
+  const only = buildCheckoutRequest({ origin: '', email: 'e', successUrl: 'https://a/b' });
+  const body = JSON.parse(only.init.body as string);
+  assert.equal(body.successUrl, 'https://a/b');
+  assert.equal('cancelUrl' in body, false);
+});
+
+test('parseCheckoutFlag accepts only success and cancel', () => {
+  assert.equal(parseCheckoutFlag('?u=octo&checkout=success'), 'success');
+  assert.equal(parseCheckoutFlag('checkout=cancel'), 'cancel');
+  assert.equal(parseCheckoutFlag('?checkout=nope'), null);
+  assert.equal(parseCheckoutFlag('?u=octo'), null);
+  assert.equal(parseCheckoutFlag(''), null);
+});
+
+test('buildPortalRequest posts email and returnUrl', () => {
+  const r = buildPortalRequest({ origin: 'https://bilko.run', email: 'me@x.io', returnUrl: 'https://bilko.run/p/' });
+  assert.equal(r.url, 'https://bilko.run/api/stripe/billing-portal');
+  assert.equal(r.init.method, 'POST');
+  assert.deepEqual(JSON.parse(r.init.body as string), { email: 'me@x.io', returnUrl: 'https://bilko.run/p/' });
+});
+
+test('parsePortalResponse maps 200, 404 and everything else', () => {
+  assert.deepEqual(parsePortalResponse(200, { url: 'https://billing.stripe.com/x' }), {
+    status: 'redirect',
+    url: 'https://billing.stripe.com/x',
+  });
+  assert.deepEqual(parsePortalResponse(404, {}), { status: 'no_customer' });
+  assert.deepEqual(parsePortalResponse(500, {}), { status: 'error', message: 'Billing portal failed (HTTP 500)' });
+  assert.equal(parsePortalResponse(200, { url: '' }).status, 'error');
+  assert.equal(parsePortalResponse(200, null).status, 'error');
 });

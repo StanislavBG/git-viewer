@@ -52,13 +52,40 @@ export function parseClaimResponse(httpStatus: number, body: unknown): ClaimResu
   return { status: 'error', message: `Claim failed (HTTP ${httpStatus})` };
 }
 
-export function buildCheckoutRequest(opts: { origin: string; email: string }): BuiltRequest {
+export function checkoutReturnUrls(href: string): { successUrl: string; cancelUrl: string } {
+  const withFlag = (flag: 'success' | 'cancel') => {
+    const u = new URL(href);
+    u.hash = '';
+    u.searchParams.delete('checkout');
+    u.searchParams.set('checkout', flag);
+    return u.toString();
+  };
+  return { successUrl: withFlag('success'), cancelUrl: withFlag('cancel') };
+}
+
+export function parseCheckoutFlag(search: string): 'success' | 'cancel' | null {
+  const v = new URLSearchParams(search).get('checkout');
+  return v === 'success' || v === 'cancel' ? v : null;
+}
+
+export function buildCheckoutRequest(opts: {
+  origin: string;
+  email: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}): BuiltRequest {
+  const body: { email: string; priceType: string; successUrl?: string; cancelUrl?: string } = {
+    email: opts.email,
+    priceType: 'git_viewer',
+  };
+  if (opts.successUrl) body.successUrl = opts.successUrl;
+  if (opts.cancelUrl) body.cancelUrl = opts.cancelUrl;
   return {
     url: opts.origin + '/api/stripe/create-checkout-session',
     init: {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: opts.email, priceType: 'git_viewer' }),
+      body: JSON.stringify(body),
     },
   };
 }
@@ -67,4 +94,27 @@ export function parseCheckoutResponse(httpStatus: number, body: unknown): Checko
   const url = asRecord(body)?.url;
   if (httpStatus === 200 && typeof url === 'string' && url) return { status: 'redirect', url };
   return { status: 'error', message: `Checkout failed (HTTP ${httpStatus})` };
+}
+
+export type PortalResult =
+  | { status: 'redirect'; url: string }
+  | { status: 'no_customer' }
+  | { status: 'error'; message: string };
+
+export function buildPortalRequest(opts: { origin: string; email: string; returnUrl: string }): BuiltRequest {
+  return {
+    url: opts.origin + '/api/stripe/billing-portal',
+    init: {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: opts.email, returnUrl: opts.returnUrl }),
+    },
+  };
+}
+
+export function parsePortalResponse(httpStatus: number, body: unknown): PortalResult {
+  const url = asRecord(body)?.url;
+  if (httpStatus === 200 && typeof url === 'string' && url) return { status: 'redirect', url };
+  if (httpStatus === 404) return { status: 'no_customer' };
+  return { status: 'error', message: `Billing portal failed (HTTP ${httpStatus})` };
 }
