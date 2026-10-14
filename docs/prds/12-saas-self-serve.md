@@ -6,7 +6,7 @@ hosted portfolio and a résumé PDF, and upgrade if they want more.
 ## Motivation
 - PRD 10/11 gave hosted portfolios (`?u=<login>`) and a claim + upgrade flow, but the mirror root still rendered the owner's portfolio. A visitor had no pitch and no way in.
 - Plans:
-  - **Free $0** — 3 projects, public data only, regenerated at most once per 24h, résumé PDF included.
+  - **Free $0** — 1 project, public data only, regenerated at most once per 24h, résumé PDF included.
   - **Paid $5/mo** (Stripe `priceType: git_viewer`) — up to 12 chosen projects, daily refresh, Writing tab from the `<login>/<login>` repo `writing/` folder.
   - bilko.run pro/business/team subscribers get Paid included.
 
@@ -18,7 +18,7 @@ hosted portfolio and a résumé PDF, and upgrade if they want more.
 
 ## Repo picker
 - Paid owners choose up to 12 public repos, listed from `api.github.com/users/<login>/repos`.
-- Saved through `POST /api/git-viewer/claim` as `{login, allowlist}` (see PRD 11). Free owners get the default 3.
+- Saved through `POST /api/git-viewer/claim` as `{login, allowlist}` (see PRD 11). Free owners get the default 1.
 
 ## Checkout return + billing
 - `create-checkout-session` sets `successUrl` / `cancelUrl` back to `?u=<login>&checkout=success|cancel`; the page shows the matching notice (success keeps the "within ~5 minutes" entitlement note).

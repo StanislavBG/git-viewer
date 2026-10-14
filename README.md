@@ -120,7 +120,7 @@ import { buildPortfolio } from '@bilkobibitkov/git-viewer';
 const { data, lockedCount } = await buildPortfolio({
   user: 'octocat',
   token: process.env.GITHUB_TOKEN,
-  maxProjects: 3,                 // repo cap, applied before per-repo fetches
+  maxProjects: 1,                 // repo cap, applied before per-repo fetches
   allowlist: ['hello-world'],     // optional: repos to show, in order
   writing: 'none',                // or 'profile-repo' to read <user>/<user>/writing/*.md
 });

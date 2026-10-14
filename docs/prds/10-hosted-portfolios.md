@@ -17,15 +17,15 @@ contract between them.
 | | Free | Paid |
 |---|---|---|
 | Price | $0 | $5/month subscription |
-| Projects shown | 3 | up to 12, user-chosen |
+| Projects shown | 1 | up to 12, user-chosen |
 | Data | public data only | public data only |
 | Refresh | regenerated at most once per 24h | daily refresh |
 | Branding | Bilko branding | Bilko branding |
 | Writing tab | none | sourced from the user's `<login>/<login>` repo `writing/` folder |
 | Locked projects | shown as upgrade cards | n/a (up to the 12-project cap) |
 
-- **Free**: 3 projects, public data only, regenerated at most once per 24h, Bilko
-  branding. Projects beyond the 3 are not rendered; they are represented as upgrade
+- **Free**: 1 project, public data only, regenerated at most once per 24h, Bilko
+  branding. Projects beyond the 1 are not rendered; they are represented as upgrade
   cards (`lockedCount` in the API response says how many).
 - **Paid**: $5/month Stripe subscription. Stripe product key `git_viewer`; price ID in
   env `STRIPE_PRICE_GITVIEWER`. Up to 12 user-chosen projects, daily refresh, Writing
@@ -98,7 +98,7 @@ Types: `status: 'ready'`, `login: string`, `tier: 'free' | 'paid'`,
 ## Data-shape change
 
 `GitData` itself is unchanged; the 200 body wraps it. `data.projects` contains only the
-projects the tier allows (3 free / up to 12 paid); `lockedCount` is the number of the
+projects the tier allows (1 free / up to 12 paid); `lockedCount` is the number of the
 user's eligible projects withheld. Dashboard-side, a new `HostedMeta`
 (`{ login, tier, lockedCount, updatedAt }`) is exposed from the loader next to
 `useGitData()`. `data.developer` is populated from the GitHub profile (`displayName`,
@@ -164,7 +164,7 @@ Informational — implemented in `~/Projects/Bilko`, not in this repo.
 2. `GET /api/git-viewer/u/:login` returns exactly the four JSON bodies above; logins
    failing the regex return 404 `not_found`.
 3. `?u=<login>` loads from `/api/git-viewer/u/<login>`; no `?u=` behaves as today.
-4. Free tier renders 3 projects plus `lockedCount` upgrade cards; paid renders up to 12.
+4. Free tier renders 1 project plus `lockedCount` upgrade cards; paid renders up to 12.
 5. `buildPortfolio` caps repos before any per-repo fetch; API calls per user are bounded
    by `maxProjects`.
 6. Pro / business / team subscribers receive Paid without a separate purchase.
