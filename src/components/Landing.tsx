@@ -9,7 +9,7 @@ const STEPS = [
 ];
 
 const FREE = [
-  '3 featured projects',
+  '1 featured project',
   'Contribution heatmap, streaks, activity',
   'Résumé PDF',
   'Refreshed at most once a day',

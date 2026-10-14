@@ -24,7 +24,7 @@ function repo(name: string, over: Partial<RepoSummary> = {}): RepoSummary {
 const names = (rs: RepoSummary[]) => rs.map((r) => r.name);
 
 test('PLAN_LIMITS', () => {
-  assert.deepEqual(PLAN_LIMITS, { free: 3, paid: 12 });
+  assert.deepEqual(PLAN_LIMITS, { free: 1, paid: 12 });
 });
 
 test('no opts selects everything, nothing locked', () => {

@@ -1,6 +1,6 @@
 import type { RepoSummary } from '../sources/github.js';
 
-export const PLAN_LIMITS = { free: 3, paid: 12 } as const;
+export const PLAN_LIMITS = { free: 1, paid: 12 } as const;
 
 export interface SelectReposOpts {
   maxProjects?: number;
