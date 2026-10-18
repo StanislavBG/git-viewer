@@ -131,6 +131,7 @@ export function TweaksPanel({ title = 'Tweaks', children }: TweaksPanelProps) {
         <button
           type="button"
           className="twk-toggle-fab"
+          data-track="tweaks-open"
           aria-label="Open tweaks panel"
           onClick={() => setOpen(true)}
           title="Tweaks"
@@ -148,6 +149,7 @@ export function TweaksPanel({ title = 'Tweaks', children }: TweaksPanelProps) {
             <b>{title}</b>
             <button
               className="twk-x"
+              data-track="tweaks-close"
               aria-label="Close tweaks"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => setOpen(false)}
@@ -169,6 +171,10 @@ export function TweakSection({ title, children }: { title: string; children?: Re
       {children}
     </>
   );
+}
+
+function slug(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 function TweakRow({
@@ -242,6 +248,7 @@ export function TweakToggle({
       <button
         type="button"
         className="twk-toggle"
+        data-track={`tweaks-${slug(label)}`}
         data-on={value ? '1' : '0'}
         role="switch"
         aria-checked={value}
@@ -289,6 +296,7 @@ export function TweakRadio<T extends string>({
             key={o.value}
             type="button"
             role="radio"
+            data-track={`tweaks-${slug(label)}-${slug(o.value)}`}
             aria-checked={o.value === value}
             onClick={() => onChange(o.value)}
           >

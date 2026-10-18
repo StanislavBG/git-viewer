@@ -334,6 +334,7 @@ export function Heatmap({ data, variant, setVariant, allowSwitch, totals }: Prop
                 <button
                   key={t.id}
                   className={variant === t.id ? 'on' : ''}
+                  data-track={`heatmap-variant-${t.id}`}
                   onClick={() => setVariant(t.id)}
                 >
                   {t.label}

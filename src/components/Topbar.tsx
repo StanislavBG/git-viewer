@@ -25,16 +25,16 @@ export function Topbar({
   };
   return (
     <div className="topbar">
-      <div className="brand" onClick={() => go('overview')} style={{ cursor: 'pointer' }}>
+      <div className="brand" data-track="nav-brand" onClick={() => go('overview')} style={{ cursor: 'pointer' }}>
         <div className="dot"></div>
         gitoverview
       </div>
       <nav>
-        <a className={tab === 'overview' ? 'on' : ''} onClick={() => go('overview')}>Overview</a>
-        <a className={tab === 'projects' ? 'on' : ''} onClick={() => go('projects')}>Projects</a>
-        <a className={tab === 'activity' ? 'on' : ''} onClick={() => go('activity')}>Activity</a>
+        <a className={tab === 'overview' ? 'on' : ''} data-track="nav-overview" onClick={() => go('overview')}>Overview</a>
+        <a className={tab === 'projects' ? 'on' : ''} data-track="nav-projects" onClick={() => go('projects')}>Projects</a>
+        <a className={tab === 'activity' ? 'on' : ''} data-track="nav-activity" onClick={() => go('activity')}>Activity</a>
         {hasWriting && (
-          <a className={tab === 'writing' ? 'on' : ''} onClick={() => go('writing')}>Writing</a>
+          <a className={tab === 'writing' ? 'on' : ''} data-track="nav-writing" onClick={() => go('writing')}>Writing</a>
         )}
       </nav>
       <div className="meta">

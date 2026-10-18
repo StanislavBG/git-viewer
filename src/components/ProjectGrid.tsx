@@ -8,7 +8,7 @@ export function ProjectGrid({ onProject }: { onProject: (id: string) => void }) 
   return (
     <div className="proj-grid">
       {projects.map((p) => (
-        <div className="proj-card" key={p.id} onClick={() => onProject(p.id)}>
+        <div className="proj-card" key={p.id} data-track="grid-open-project" onClick={() => onProject(p.id)}>
           <div className="top">
             <div className="name">{p.name}</div>
             <div className={`status ${p.status}`}>{p.status}</div>

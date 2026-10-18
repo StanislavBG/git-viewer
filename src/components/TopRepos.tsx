@@ -19,7 +19,7 @@ function Column({
       <div className="podium">
         {rows.length === 0 && <div className="empty">—</div>}
         {rows.map((r, i) => (
-          <div className="row" key={r.id} onClick={() => onProject(r.id)}>
+          <div className="row" key={r.id} data-track="highlights-open-project" onClick={() => onProject(r.id)}>
             <div className="rank">{i + 1}</div>
             <div className="body">
               <div className="name">{r.name}</div>

@@ -13,7 +13,7 @@ export function RecentFeed({ onProject }: { onProject: (id: string) => void }) {
             <div className="body">
               <div className="msg">{c.msg}</div>
               <div className="proj">
-                <a onClick={() => onProject(c.project)} style={{ cursor: 'pointer' }}>
+                <a data-track="feed-open-project" onClick={() => onProject(c.project)} style={{ cursor: 'pointer' }}>
                   {c.project}
                 </a>
                 <span className="arr">›</span>main

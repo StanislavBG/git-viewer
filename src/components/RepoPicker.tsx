@@ -91,10 +91,10 @@ export function RepoPicker({
         )}
       </div>
       <div className="repo-picker-actions">
-        <button disabled={saving || load.state !== 'ready' || selected.length === 0} onClick={() => void save()}>
+        <button data-track="subscribe-picker-save" disabled={saving || load.state !== 'ready' || selected.length === 0} onClick={() => void save()}>
           Save
         </button>
-        <button disabled={saving} onClick={onClose}>Cancel</button>
+        <button data-track="picker-cancel" disabled={saving} onClick={onClose}>Cancel</button>
       </div>
     </div>
   );

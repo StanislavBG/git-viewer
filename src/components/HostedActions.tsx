@@ -11,6 +11,8 @@ import {
   parseClaimResponse,
   parsePortalResponse,
 } from '../data/claim';
+import { PRODUCT, checkoutProps, restoreScreen, trackFlow, trackScreen } from '../data/telemetry';
+import { version as APP_VERSION } from '../../package.json';
 
 type ClerkLike = {
   load: () => Promise<void>;
@@ -33,6 +35,8 @@ declare global {
 }
 
 let clerkPromise: Promise<ClerkLike> | null = null;
+// useHostedActions mounts once per ClaimBar/UpgradeButton; the Stripe return is one event.
+let checkoutReturnTracked = false;
 
 function injectClerkScript(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -62,6 +66,8 @@ function loadClerk(): Promise<ClerkLike> {
   });
   return clerkPromise;
 }
+
+export const RESUME_ARTIFACT = { artifact: 'resume-pdf', version: APP_VERSION, platform: 'web' } as const;
 
 type Msg = { kind: 'ok' | 'err'; text: string } | null;
 
@@ -93,6 +99,10 @@ export function useHostedActions() {
   useEffect(() => {
     if (!tenant) return;
     const flag = parseCheckoutFlag(window.location.search);
+    if (flag && !checkoutReturnTracked) {
+      checkoutReturnTracked = true;
+      trackFlow('checkout', flag, checkoutProps('stripe-return'));
+    }
     if (flag === 'success') {
       setMsg({ kind: 'ok', text: 'Payment received — your portfolio switches to Pro within ~5 minutes. Reload to check.' });
     } else if (flag === 'cancel') {
@@ -104,12 +114,15 @@ export function useHostedActions() {
 
   const claim = useCallback(async (allowlist?: string[]): Promise<boolean> => {
     if (!clerk || !tenant) return false;
+    const mode = allowlist ? 'choose-projects' : 'claim';
+    trackFlow('claim', 'start', { mode, tier: tenant.tier });
     let claimed = false;
     setBusy(true);
     setMsg(null);
     try {
       const token = await clerk.session?.getToken();
       if (!token) {
+        trackFlow('claim', 'fail', { mode, reason: 'sign-in-required' });
         clerk.openSignIn();
         return false;
       }
@@ -118,15 +131,20 @@ export function useHostedActions() {
       const res = parseClaimResponse(r.status, await r.json().catch(() => null));
       if (res.status === 'claimed') {
         claimed = true;
+        trackFlow('claim', 'success', { mode, tier: res.tier, projects: res.allowlist.length });
         setMsg({ kind: 'ok', text: 'Portfolio claimed. Changes show up within ~5 minutes.' });
       } else if (res.status === 'sign_in_required') {
+        trackFlow('claim', 'fail', { mode, reason: 'sign-in-required' });
         clerk.openSignIn();
       } else if (res.status === 'not_owner') {
+        trackFlow('claim', 'fail', { mode, reason: 'not-owner' });
         setMsg({ kind: 'err', text: 'Your linked GitHub account does not match this portfolio.' });
       } else {
+        trackFlow('claim', 'fail', { mode, reason: 'error', http: r.status });
         setMsg({ kind: 'err', text: res.message });
       }
     } catch (e) {
+      trackFlow('claim', 'fail', { mode, reason: 'network' });
       setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
@@ -134,10 +152,12 @@ export function useHostedActions() {
     return claimed;
   }, [clerk, tenant]);
 
-  const upgrade = useCallback(async () => {
+  const upgrade = useCallback(async (source: string) => {
     if (!clerk) return;
+    const props = checkoutProps(source);
     const email = clerk.user?.primaryEmailAddress?.emailAddress;
     if (!email) {
+      trackFlow('checkout', 'fail', { ...props, reason: 'sign-in-required' });
       clerk.openSignIn();
       return;
     }
@@ -148,9 +168,15 @@ export function useHostedActions() {
       const req = buildCheckoutRequest({ origin: window.location.origin, email, successUrl, cancelUrl });
       const r = await fetch(req.url, req.init);
       const res = parseCheckoutResponse(r.status, await r.json().catch(() => null));
-      if (res.status === 'redirect') window.location.assign(res.url);
-      else setMsg({ kind: 'err', text: res.message });
+      if (res.status === 'redirect') {
+        trackFlow('checkout', 'checkout-redirect', props);
+        window.location.assign(res.url);
+      } else {
+        trackFlow('checkout', 'fail', { ...props, reason: 'error', http: r.status });
+        setMsg({ kind: 'err', text: res.message });
+      }
     } catch (e) {
+      trackFlow('checkout', 'fail', { ...props, reason: 'network' });
       setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
@@ -159,8 +185,10 @@ export function useHostedActions() {
 
   const manageBilling = useCallback(async (): Promise<void> => {
     if (!clerk) return;
+    trackFlow('billing-portal', 'start', { product: PRODUCT });
     const email = clerk.user?.primaryEmailAddress?.emailAddress;
     if (!email) {
+      trackFlow('billing-portal', 'fail', { reason: 'sign-in-required' });
       clerk.openSignIn();
       return;
     }
@@ -172,10 +200,18 @@ export function useHostedActions() {
       const req = buildPortalRequest({ origin: window.location.origin, email, returnUrl: back.toString() });
       const r = await fetch(req.url, req.init);
       const res = parsePortalResponse(r.status, await r.json().catch(() => null));
-      if (res.status === 'redirect') window.location.assign(res.url);
-      else if (res.status === 'no_customer') setMsg({ kind: 'err', text: `No subscription found for ${email}.` });
-      else setMsg({ kind: 'err', text: res.message });
+      if (res.status === 'redirect') {
+        trackFlow('billing-portal', 'success');
+        window.location.assign(res.url);
+      } else if (res.status === 'no_customer') {
+        trackFlow('billing-portal', 'fail', { reason: 'no-customer' });
+        setMsg({ kind: 'err', text: `No subscription found for ${email}.` });
+      } else {
+        trackFlow('billing-portal', 'fail', { reason: 'error', http: r.status });
+        setMsg({ kind: 'err', text: res.message });
+      }
     } catch (e) {
+      trackFlow('billing-portal', 'fail', { reason: 'network' });
       setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
@@ -189,6 +225,13 @@ export function ClaimBar() {
   const h = useHostedActions();
   const { projects } = useGitData();
   const [picking, setPicking] = useState(false);
+  const offerShown = h.signedIn && h.tenant?.tier === 'free';
+  useEffect(() => {
+    if (offerShown) trackFlow('checkout', 'view-offer', checkoutProps('claim-bar'));
+  }, [offerShown]);
+  useEffect(() => {
+    if (picking) trackScreen('repo-picker');
+  }, [picking]);
   if (!h.tenant) return null;
   const resumeUrl = new URL(window.location.href);
   resumeUrl.searchParams.set('print', '1');
@@ -198,36 +241,53 @@ export function ClaimBar() {
       <a
         className="resume-link"
         href={resumeUrl.toString()}
+        data-track="download-resume-pdf"
+        onClick={() => trackFlow('download', 'click-download', RESUME_ARTIFACT)}
         style={{ font: 'inherit', fontWeight: 600, color: 'inherit', textDecoration: 'underline', border: '1px solid currentColor', padding: '2px 10px', borderRadius: 4 }}
       >
         Résumé PDF
       </a>
-      <span>Hosted portfolio · {h.tenant.login} · {h.tenant.tier}</span>
+      <span data-track-redact>Hosted portfolio · {h.tenant.login} · {h.tenant.tier}</span>
       {!h.signedIn ? (
-        <button disabled={!h.ready} onClick={h.signIn}>Sign in</button>
+        <button data-track="subscribe-sign-in" disabled={!h.ready} onClick={h.signIn}>Sign in</button>
       ) : (
         <>
-          <button disabled={h.busy} onClick={() => void h.claim()}>Claim this portfolio</button>
+          <button data-track="subscribe-claim" disabled={h.busy} onClick={() => void h.claim()}>Claim this portfolio</button>
           {h.tenant.tier === 'free' && (
-            <button disabled={h.busy} onClick={() => void h.upgrade()}>Upgrade — $5/mo</button>
+            <button
+              data-track="subscribe-upgrade"
+              disabled={h.busy}
+              onClick={() => {
+                trackFlow('checkout', 'click-buy', checkoutProps('claim-bar'));
+                void h.upgrade('claim-bar');
+              }}
+            >
+              Upgrade — $5/mo
+            </button>
           )}
           {h.tenant.tier === 'paid' && (
             <>
-              <button disabled={h.busy} onClick={() => setPicking(true)}>Choose projects</button>
-              <button disabled={h.busy} onClick={() => void h.manageBilling()}>Manage billing</button>
+              <button data-track="subscribe-choose-projects" disabled={h.busy} onClick={() => setPicking(true)}>Choose projects</button>
+              <button data-track="subscribe-manage-billing" disabled={h.busy} onClick={() => void h.manageBilling()}>Manage billing</button>
             </>
           )}
         </>
       )}
-      {h.msg && <span className={`claim-msg ${h.msg.kind}`}>{h.msg.text}</span>}
+      {h.msg && <span className={`claim-msg ${h.msg.kind}`} data-track-redact>{h.msg.text}</span>}
       {picking && (
         <RepoPicker
           login={h.tenant.login}
           initial={projects.map((p) => p.name)}
           onSave={async (names) => {
-            if (await h.claim(names)) setPicking(false);
+            if (await h.claim(names)) {
+              setPicking(false);
+              restoreScreen();
+            }
           }}
-          onClose={() => setPicking(false)}
+          onClose={() => {
+            setPicking(false);
+            restoreScreen();
+          }}
         />
       )}
     </div>
@@ -236,8 +296,19 @@ export function ClaimBar() {
 
 export function UpgradeButton() {
   const h = useHostedActions();
+  useEffect(() => {
+    trackFlow('checkout', 'view-offer', checkoutProps('projects-tab'));
+  }, []);
   return (
-    <button className="upgrade-btn" disabled={h.busy || !h.ready} onClick={() => void (h.signedIn ? h.upgrade() : h.signIn())}>
+    <button
+      className="upgrade-btn"
+      data-track="subscribe-unlock-all"
+      disabled={h.busy || !h.ready}
+      onClick={() => {
+        trackFlow('checkout', 'click-buy', checkoutProps('projects-tab'));
+        void (h.signedIn ? h.upgrade('projects-tab') : h.signIn());
+      }}
+    >
       {h.signedIn ? 'Unlock all projects — $5/mo' : 'Sign in to unlock all projects — $5/mo'}
     </button>
   );

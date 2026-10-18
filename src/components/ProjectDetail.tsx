@@ -20,7 +20,7 @@ export function ProjectDetail({
   if (!p || !det) {
     return (
       <div className="shell detail">
-        <a className="back-link" onClick={onBack}>
+        <a className="back-link" data-track="detail-back" onClick={onBack}>
           ← all projects
         </a>
         <p style={{ marginTop: 24 }}>Project not found.</p>
@@ -36,7 +36,7 @@ export function ProjectDetail({
 
   return (
     <div className="shell detail">
-      <a className="back-link" onClick={onBack}>
+      <a className="back-link" data-track="detail-back" onClick={onBack}>
         ← all projects
       </a>
 

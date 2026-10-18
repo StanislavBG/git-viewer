@@ -32,12 +32,12 @@ export function ProjectsTab({ onProject }: { onProject: (id: string) => void }) 
       <div className="projects-toolbar">
         <div className="filter-group">
           {STATUS_OPTIONS.map((s) => (
-            <span key={s} className={`chip ${status === s ? 'on' : ''}`} onClick={() => setStatus(s)}>{s}</span>
+            <span key={s} className={`chip ${status === s ? 'on' : ''}`} data-track="projects-filter-status" onClick={() => setStatus(s)}>{s}</span>
           ))}
         </div>
         <div className="filter-group">
           {langs.map((l) => (
-            <span key={l} className={`chip ${lang === l ? 'on' : ''}`} onClick={() => setLang(l)}>{l}</span>
+            <span key={l} className={`chip ${lang === l ? 'on' : ''}`} data-track="projects-filter-language" onClick={() => setLang(l)}>{l}</span>
           ))}
         </div>
         <div className="grow" />
@@ -49,7 +49,7 @@ export function ProjectsTab({ onProject }: { onProject: (id: string) => void }) 
           const ai = aiSummaries[p.id];
           if (!ai) return null;
           return (
-            <div className="proj-mag" key={p.id} onClick={() => onProject(p.id)}>
+            <div className="proj-mag" key={p.id} data-track="projects-open-summary" onClick={() => onProject(p.id)}>
               <div className="header">
                 <div>
                   <div className="ai-tag"><span className="dot" />AI summary · v1</div>

@@ -5,6 +5,8 @@ import { HeadlineStrip } from './HeadlineStrip';
 import { Streaks } from './Streaks';
 import { TopRepos } from './TopRepos';
 import { Languages } from './Languages';
+import { RESUME_ARTIFACT } from './HostedActions';
+import { trackFlow, trackScreen } from '../data/telemetry';
 
 // PRD-08. Single-column linearized layout for ?print=1 / Cmd-P.
 // Reuses the dashboard's components but skips the tweaks panel and topbar,
@@ -13,10 +15,18 @@ export function PrintShell() {
   const data = useGitData();
   const tenant = useTenant();
   const printed = useRef(false);
+  useEffect(() => trackScreen('resume'), []);
   useEffect(() => {
     if (!tenant || printed.current) return;
     printed.current = true;
-    setTimeout(() => window.print(), 300);
+    setTimeout(() => {
+      try {
+        window.print();
+        trackFlow('download', 'download-started', RESUME_ARTIFACT);
+      } catch {
+        trackFlow('download', 'download-failed', RESUME_ARTIFACT);
+      }
+    }, 300);
   }, [tenant]);
   return (
     <div className="shell print-shell">

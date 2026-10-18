@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { exampleLogins, normalizeLoginInput } from '../data/landing';
+import { checkoutProps, markBuildPending, trackFlow, trackScreen } from '../data/telemetry';
 
 const STEPS = [
   'Enter your GitHub username',
@@ -45,16 +46,21 @@ export function Landing() {
 
   useEffect(() => {
     document.title = 'Your Git, your Résumé · git-viewer by Bilko';
+    trackScreen('landing');
+    trackFlow('checkout', 'view-offer', checkoutProps('landing'));
   }, []);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const login = normalizeLoginInput(inputRef.current?.value ?? '');
     if (!login) {
+      trackFlow('build-portfolio', 'fail', { source: 'landing', reason: 'invalid-input' });
       setError(true);
       return;
     }
     setError(false);
+    trackFlow('build-portfolio', 'start', { source: 'landing' });
+    markBuildPending();
     window.location.search = '?u=' + encodeURIComponent(login);
   };
 
@@ -69,7 +75,7 @@ export function Landing() {
           Paste your GitHub username. Get an editorial portfolio and a print-ready résumé built
           from your real commits — no install, no token, no setup.
         </p>
-        <form className="landing-form" aria-label="Build my portfolio" onSubmit={onSubmit}>
+        <form data-track-redact className="landing-form" aria-label="Build my portfolio" onSubmit={onSubmit}>
           <input
             ref={inputRef}
             type="text"
@@ -82,7 +88,7 @@ export function Landing() {
             aria-invalid={error}
             onChange={() => error && setError(false)}
           />
-          <button type="submit">Build my portfolio</button>
+          <button type="submit" data-track="hero-build-portfolio">Build my portfolio</button>
         </form>
         {error && (
           <p className="landing-error" role="alert">
@@ -94,9 +100,9 @@ export function Landing() {
       <section aria-labelledby="landing-example">
         <h2 id="landing-example">See an example</h2>
         <ul className="landing-examples">
-          {exampleLogins.map((login) => (
+          {exampleLogins.map((login, i) => (
             <li key={login}>
-              <a href={'?u=' + encodeURIComponent(login)}>{login}</a>
+              <a href={'?u=' + encodeURIComponent(login)} data-track={`example-open-${i + 1}`}>{login}</a>
             </li>
           ))}
         </ul>
@@ -122,7 +128,7 @@ export function Landing() {
                 <li key={f}>{f}</li>
               ))}
             </ul>
-            <button type="button" onClick={focusInput}>
+            <button type="button" data-track="pricing-start-free" onClick={focusInput}>
               Start free
             </button>
           </div>
@@ -137,7 +143,14 @@ export function Landing() {
               ))}
             </ul>
             <p className="landing-note">Included with bilko.run Pro, Business and Team.</p>
-            <button type="button" onClick={focusInput}>
+            <button
+              type="button"
+              data-track="subscribe-pricing-go-pro"
+              onClick={() => {
+                trackFlow('checkout', 'click-buy', checkoutProps('landing'));
+                focusInput();
+              }}
+            >
               Go Pro
             </button>
           </div>
@@ -157,7 +170,7 @@ export function Landing() {
       </section>
 
       <footer className="landing-foot">
-        <a href="https://bilko.run/projects">by Bilko · bilko.run/projects</a>
+        <a href="https://bilko.run/projects" data-track="footer-bilko-projects">by Bilko · bilko.run/projects</a>
       </footer>
     </div>
   );

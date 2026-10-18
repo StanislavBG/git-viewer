@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Landing } from './components/Landing';
 import { isLandingMode } from './data/landing';
 import { GitDataProvider, useGitData, useGitDataState } from './data/loader';
+import { markBuildPending, takeBuildPending, trackFlow, trackScreen } from './data/telemetry';
+import { RESUME_ARTIFACT } from './components/HostedActions';
 import { useTweaks } from './state/tweaks';
 import { useRoute } from './state/route';
 import { Topbar } from './components/Topbar';
@@ -144,13 +146,16 @@ function OverviewTab({
           this is the lab — see the storefront at{' '}
           <a
             href="https://bilko.run/projects"
+            data-track="footer-storefront"
             style={{ color: 'var(--accent)', textDecoration: 'underline dotted' }}
           >
             bilko.run/projects
           </a>
           <a
             className="print-link"
+            data-track="download-print"
             onClick={() => {
+              trackFlow('download', 'click-download', { ...RESUME_ARTIFACT, source: 'footer' });
               const u = new URL(window.location.href);
               u.searchParams.set('print', '1');
               window.location.href = u.toString();
@@ -193,6 +198,10 @@ function Shell() {
     setView('home');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
+
+  useEffect(() => {
+    trackScreen(view !== 'home' ? 'project-detail' : tab);
+  }, [view, tab]);
 
   const tabBody = view !== 'home' ? (
     <ProjectDetail id={view} onBack={onHome} variant={variant} setVariant={setVariant} />
@@ -266,8 +275,30 @@ function isPrintMode(): boolean {
   return new URLSearchParams(window.location.search).get('print') === '1';
 }
 
-function DataGate() {
+function usePortfolioLoadTelemetry() {
   const state = useGitDataState();
+  const hosted = new URLSearchParams(window.location.search).has('u');
+  useEffect(() => {
+    const source = hosted ? 'hosted' : 'bundled';
+    if (state.status === 'loading') {
+      trackFlow('portfolio-load', 'start', { source });
+      return;
+    }
+    if (state.status !== 'ready') trackScreen(state.status.replace('_', '-'));
+    if (state.status === 'generating') {
+      trackFlow('portfolio-load', 'generating', { source });
+      return;
+    }
+    const ok = state.status === 'ready';
+    const reason = ok ? undefined : state.status.replace('_', '-');
+    trackFlow('portfolio-load', ok ? 'success' : 'fail', { source, reason });
+    if (takeBuildPending()) trackFlow('build-portfolio', ok ? 'success' : 'fail', { source: 'landing', reason });
+  }, [state.status, hosted]);
+  return state;
+}
+
+function DataGate() {
+  const state = usePortfolioLoadTelemetry();
   if (state.status === 'loading') {
     return (
       <div
@@ -317,10 +348,14 @@ function DataGate() {
         <div>
           <div style={{ marginBottom: 16 }}>no GitHub user @{state.login}</div>
           <form
+            data-track-redact
             onSubmit={(e) => {
               e.preventDefault();
               const v = String(new FormData(e.currentTarget).get('u') ?? '').trim();
-              if (v) window.location.search = `?u=${encodeURIComponent(v)}`;
+              if (!v) return;
+              trackFlow('build-portfolio', 'start', { source: 'not-found' });
+              markBuildPending();
+              window.location.search = `?u=${encodeURIComponent(v)}`;
             }}
           >
             <input
@@ -328,7 +363,7 @@ function DataGate() {
               placeholder="github username"
               style={{ fontFamily: 'inherit', fontSize: 'inherit', marginRight: 8 }}
             />
-            <button type="submit">View</button>
+            <button type="submit" data-track="notfound-build-portfolio">View</button>
           </form>
         </div>
       </div>

@@ -19,6 +19,7 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 | 10  | Hosted multi-user portfolios (bilko.run)   | — | implemented |
 | 11  | Hosted claim + upgrade flow (Clerk, Stripe) | — | implemented |
 | 12  | Self-serve SaaS: landing, repo picker, billing return, résumé CTA | — | implemented |
+| 13  | bilko.run observability tagging: data-track, screen views, flows | — | implemented (not yet published) |
 
 All v3.0 + v3.1 PRDs landed.
 

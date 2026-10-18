@@ -31,7 +31,7 @@ function Row({ ev }: { ev: ActivityEvent }) {
       <div className="body">
         <div className="msg">
           {ev.url ? (
-            <a href={ev.url} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+            <a href={ev.url} target="_blank" rel="noreferrer" data-track="activity-open-event" style={{ color: 'inherit' }}>
               {ev.title}
             </a>
           ) : (
