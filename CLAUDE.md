@@ -21,14 +21,13 @@ Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, 
 - `pnpm sync` — rebuild `public/data.json` from the GitHub API. Reads `.env` (`GITHUB_USER`, optional `GITHUB_TOKEN`).
 - `pnpm build` — emit `dist/`.
 - `pnpm typecheck` — `tsc --noEmit` across `src/` + `pipeline/`.
-- `pnpm test` — node:test unit tests, then `build:lib` + an import check of the compiled `dist-lib/`.
+- `pnpm test` — node:test unit tests.
 
-## npm library
-The repo root is also the npm package `@bilkobibitkov/git-viewer` (ESM, `dist-lib/`, entry `pipeline/index.ts`); bilko.run's hosted `?u=` portfolios call its `buildPortfolio`. Only `@octokit/rest` and `p-limit` are runtime `dependencies` — react, dotenv, vite etc. stay in `devDependencies`. Release: bump `version` + `CHANGELOG.md`, push tag `v<ver>`; `release.yml` publishes with provenance via the `NPM_AUTOMATION_TOKEN` repo secret (not set yet — 0.1.0 was published locally).
+git-viewer is a front page only; nothing is sold.
 
 ## Deploy — two lanes, one `dist/`
 1. **GitHub Pages (canonical)** — `StanislavBG/git-viewer`. CI runs typecheck+sync+build+deploy on push and daily at 09:00 UTC, and commits the refreshed `public/data.json` back to `main` as a keepalive so the cron never goes dormant. Uses `secrets.GITHUB_TOKEN` (auto-injected, 1000/h) — no PAT needed for public repos. Set `secrets.PORTFOLIO_TOKEN` if you ever need cross-org reach.
-2. **bilko.run/projects/git-viewer/ (mirror)** — build with `pnpm build:bilko` (drops `data.json`/`data.sample.json`: the mirror fetches GH Pages' copy at runtime, and bilko.run's publish budget is 200 KB gz for the whole dir — never publish with a budget bypass). Clerk's `clerk.browser.js` is injected at runtime from `clerk.bilko.run`, never bundled; the publishable key defaults in `HostedActions.tsx`. Copy `dist/` into `~/Projects/Bilko/public/projects/git-viewer/`, register in `Bilko/src/data/standalone-projects.json`, push to both Bilko remotes (`origin` = bilko-run, `content-grade`). Render redeploys ~60–90s. Or use the `bilko-host` MCP via `.mcp.json` (gitignored) — `register_static_project` once, `publish_static_project` each release.
+2. **bilko.run/projects/git-viewer/ (mirror)** — build with `pnpm build:bilko` (drops `data.json`/`data.sample.json`: the mirror fetches GH Pages' copy at runtime, and bilko.run's publish budget is 200 KB gz for the whole dir — never publish with a budget bypass).
 
 ## Maintenance
 - The daily cron commits `public/data.json` back to `main` as `github-actions[bot]` whenever the data changed — expect these commits in history; `git pull` before starting work.
@@ -38,7 +37,7 @@ The repo root is also the npm package `@bilkobibitkov/git-viewer` (ESM, `dist-li
 - A failed `pnpm sync` (`continue-on-error: true`) still lets `pnpm build` + deploy run, so the site redeploys with the last committed `data.json` instead of going dark.
 
 ## Canonical-data convention (important)
-`src/data/loader.tsx` checks `window.location.hostname`. On the canonical host (`stanislavbg.github.io`) and during local dev (`localhost`/`127.0.0.1`), it reads the bundled `data.json`. On any other host, it fetches `https://stanislavbg.github.io/git-viewer/data.json` at runtime. This makes GH Pages the single source of truth — the daily cron refreshes both lanes without re-publishing the Bilko mirror. GH Pages serves the file with `Access-Control-Allow-Origin: *`. When adding a new mirror host, just extend the canonical-host whitelist (or trust the default fallback path). On non-canonical hosts, a URL with no `?u=` renders the landing page (`src/components/Landing.tsx`), while `?landing=1` forces it locally; the owner's portfolio on the mirror is at `?u=StanislavBG`.
+`src/data/loader.tsx` checks `window.location.hostname`. On the canonical host (`stanislavbg.github.io`) and during local dev (`localhost`/`127.0.0.1`), it reads the bundled `data.json`. On any other host, it fetches `https://stanislavbg.github.io/git-viewer/data.json` at runtime. This makes GH Pages the single source of truth — the daily cron refreshes both lanes without re-publishing the Bilko mirror. GH Pages serves the file with `Access-Control-Allow-Origin: *`. When adding a new mirror host, just extend the canonical-host whitelist (or trust the default fallback path).
 
 ## Conventions
 - TS strict. No comments unless the *why* is non-obvious.
