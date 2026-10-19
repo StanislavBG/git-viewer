@@ -52,6 +52,18 @@ export function parseClaimResponse(httpStatus: number, body: unknown): ClaimResu
   return { status: 'error', message: `Claim failed (HTTP ${httpStatus})` };
 }
 
+export type ExternalAccount = { provider: string; username?: string | null };
+
+export function githubLinkState(
+  accounts: readonly ExternalAccount[] | null | undefined,
+  login: string,
+): 'linked' | 'other-account' | 'none' {
+  const github = (accounts ?? []).filter((a) => a.provider === 'oauth_github' || a.provider === 'github');
+  if (github.length === 0) return 'none';
+  const want = login.toLowerCase();
+  return github.some((a) => a.username?.toLowerCase() === want) ? 'linked' : 'other-account';
+}
+
 export function upgradeStep(
   claim: ClaimResult | null,
   signedIn: boolean,

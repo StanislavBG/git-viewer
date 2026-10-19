@@ -11,6 +11,7 @@ import {
   buildPortalRequest,
   parsePortalResponse,
   upgradeStep,
+  githubLinkState,
   type ClaimResult,
 } from './claim.js';
 
@@ -138,4 +139,17 @@ test('parsePortalResponse maps 200, 404 and everything else', () => {
   assert.deepEqual(parsePortalResponse(500, {}), { status: 'error', message: 'Billing portal failed (HTTP 500)' });
   assert.equal(parsePortalResponse(200, { url: '' }).status, 'error');
   assert.equal(parsePortalResponse(200, null).status, 'error');
+});
+
+test('githubLinkState distinguishes linked, other-account and none', () => {
+  assert.equal(githubLinkState([{ provider: 'oauth_github', username: 'Octo' }], 'octo'), 'linked');
+  assert.equal(githubLinkState([{ provider: 'github', username: 'octo' }], 'OCTO'), 'linked');
+  assert.equal(
+    githubLinkState([{ provider: 'oauth_google', username: 'octo' }, { provider: 'oauth_github', username: 'other' }], 'octo'),
+    'other-account',
+  );
+  assert.equal(githubLinkState([{ provider: 'oauth_google', username: 'octo' }], 'octo'), 'none');
+  assert.equal(githubLinkState([], 'octo'), 'none');
+  assert.equal(githubLinkState(undefined, 'octo'), 'none');
+  assert.equal(githubLinkState(null, 'octo'), 'none');
 });

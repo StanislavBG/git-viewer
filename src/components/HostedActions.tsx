@@ -6,6 +6,8 @@ import {
   buildClaimRequest,
   buildPortalRequest,
   checkoutReturnUrls,
+  githubLinkState,
+  type ExternalAccount,
   parseCheckoutFlag,
   parseCheckoutResponse,
   parseClaimResponse,
@@ -17,9 +19,13 @@ import { version as APP_VERSION } from '../../package.json';
 type ClerkLike = {
   load: () => Promise<void>;
   openSignIn: () => void;
+  openUserProfile: () => void;
   addListener: (cb: () => void) => void;
   session?: { getToken: () => Promise<string | null> } | null;
-  user?: { primaryEmailAddress?: { emailAddress: string } | null } | null;
+  user?: {
+    primaryEmailAddress?: { emailAddress: string } | null;
+    externalAccounts?: ExternalAccount[];
+  } | null;
 };
 
 // Publishable keys are public; defaulting it means a plain `pnpm build` can't ship sign-in disabled.
@@ -70,6 +76,11 @@ function loadClerk(): Promise<ClerkLike> {
 export const RESUME_ARTIFACT = { artifact: 'resume-pdf', version: APP_VERSION, platform: 'web' } as const;
 
 type Msg = { kind: 'ok' | 'err'; text: string } | null;
+type GithubPrompt = { state: 'none' | 'other-account'; linked: string | null } | null;
+
+function linkedGithubName(accounts: ExternalAccount[] | undefined): string | null {
+  return accounts?.find((a) => a.provider === 'oauth_github' || a.provider === 'github')?.username ?? null;
+}
 
 export function useHostedActions() {
   const tenant = useTenant();
@@ -77,6 +88,7 @@ export function useHostedActions() {
   const [signedIn, setSignedIn] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
+  const [githubPrompt, setGithubPrompt] = useState<GithubPrompt>(null);
 
   useEffect(() => {
     if (!tenant) return;
@@ -112,13 +124,26 @@ export function useHostedActions() {
 
   const signIn = useCallback(() => clerk?.openSignIn(), [clerk]);
 
+  const linkGithub = useCallback(() => {
+    trackFlow('claim', 'link-github');
+    clerk?.openUserProfile();
+  }, [clerk]);
+
   const claim = useCallback(async (allowlist?: string[]): Promise<boolean> => {
     if (!clerk || !tenant) return false;
     const mode = allowlist ? 'choose-projects' : 'claim';
     trackFlow('claim', 'start', { mode, tier: tenant.tier });
     let claimed = false;
-    setBusy(true);
     setMsg(null);
+    setGithubPrompt(null);
+    const accounts = clerk.user?.externalAccounts;
+    const preState = accounts ? githubLinkState(accounts, tenant.login) : 'linked';
+    if (preState !== 'linked') {
+      trackFlow('claim', 'fail', { mode, reason: 'github-not-linked' });
+      setGithubPrompt({ state: preState, linked: linkedGithubName(accounts) });
+      return false;
+    }
+    setBusy(true);
     try {
       const token = await clerk.session?.getToken();
       if (!token) {
@@ -138,7 +163,9 @@ export function useHostedActions() {
         clerk.openSignIn();
       } else if (res.status === 'not_owner') {
         trackFlow('claim', 'fail', { mode, reason: 'not-owner' });
-        setMsg({ kind: 'err', text: 'Your linked GitHub account does not match this portfolio.' });
+        trackFlow('claim', 'fail', { mode, reason: 'github-not-linked' });
+        const linked = linkedGithubName(clerk.user?.externalAccounts);
+        setGithubPrompt({ state: linked ? 'other-account' : 'none', linked });
       } else {
         trackFlow('claim', 'fail', { mode, reason: 'error', http: r.status });
         setMsg({ kind: 'err', text: res.message });
@@ -223,7 +250,7 @@ export function useHostedActions() {
     }
   }, [clerk]);
 
-  return { tenant, ready: !!clerk, signedIn, busy, msg, signIn, claim, upgrade, manageBilling };
+  return { tenant, ready: !!clerk, signedIn, busy, msg, githubPrompt, signIn, linkGithub, claim, upgrade, manageBilling };
 }
 
 export function ClaimBar() {
@@ -277,6 +304,14 @@ export function ClaimBar() {
             </>
           )}
         </>
+      )}
+      {h.githubPrompt && (
+        <span className="claim-msg err" data-track-redact>
+          {h.githubPrompt.state === 'other-account' && h.githubPrompt.linked
+            ? `Your linked GitHub account is ${h.githubPrompt.linked}, but this portfolio belongs to ${h.tenant.login}. `
+            : `Link the GitHub account ${h.tenant.login} to claim this portfolio. `}
+          <button data-track="claim-link-github" onClick={h.linkGithub}>Connect GitHub</button>
+        </span>
       )}
       {h.msg && <span className={`claim-msg ${h.msg.kind}`} data-track-redact>{h.msg.text}</span>}
       {picking && (
