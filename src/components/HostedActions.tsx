@@ -161,6 +161,11 @@ export function useHostedActions() {
       clerk.openSignIn();
       return;
     }
+    const claimed = await claim();
+    if (!claimed) {
+      trackFlow('checkout', 'fail', { ...props, reason: 'claim-failed' });
+      return;
+    }
     setBusy(true);
     setMsg(null);
     try {
@@ -181,7 +186,7 @@ export function useHostedActions() {
     } finally {
       setBusy(false);
     }
-  }, [clerk]);
+  }, [clerk, claim]);
 
   const manageBilling = useCallback(async (): Promise<void> => {
     if (!clerk) return;

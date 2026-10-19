@@ -52,6 +52,17 @@ export function parseClaimResponse(httpStatus: number, body: unknown): ClaimResu
   return { status: 'error', message: `Claim failed (HTTP ${httpStatus})` };
 }
 
+export function upgradeStep(
+  claim: ClaimResult | null,
+  signedIn: boolean,
+): 'sign-in' | 'checkout' | 'not-owner' | 'error' {
+  if (!signedIn) return 'sign-in';
+  if (claim?.status === 'claimed') return 'checkout';
+  if (claim?.status === 'not_owner') return 'not-owner';
+  if (claim?.status === 'sign_in_required') return 'sign-in';
+  return 'error';
+}
+
 export function checkoutReturnUrls(href: string): { successUrl: string; cancelUrl: string } {
   const withFlag = (flag: 'success' | 'cancel') => {
     const u = new URL(href);

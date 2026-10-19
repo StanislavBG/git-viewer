@@ -10,7 +10,20 @@ import {
   parseCheckoutFlag,
   buildPortalRequest,
   parsePortalResponse,
+  upgradeStep,
+  type ClaimResult,
 } from './claim.js';
+
+test('upgradeStep gates checkout on a successful claim', () => {
+  const claimed: ClaimResult = { status: 'claimed', login: 'octo', tier: 'free', allowlist: [] };
+  assert.equal(upgradeStep(claimed, false), 'sign-in');
+  assert.equal(upgradeStep(null, false), 'sign-in');
+  assert.equal(upgradeStep(claimed, true), 'checkout');
+  assert.equal(upgradeStep({ status: 'not_owner' }, true), 'not-owner');
+  assert.equal(upgradeStep({ status: 'sign_in_required' }, true), 'sign-in');
+  assert.equal(upgradeStep({ status: 'error', message: 'x' }, true), 'error');
+  assert.equal(upgradeStep(null, true), 'error');
+});
 
 test('buildClaimRequest posts login with bearer token', () => {
   const r = buildClaimRequest({ origin: 'https://bilko.run', login: 'octo', token: 'tok' });
