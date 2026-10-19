@@ -16,9 +16,12 @@ rahuldkjain/github-profile-readme-generator, GitHub native achievements).
 | 07  | Productive-time 7×24 heatmap               | 1 | implemented |
 | 08  | Resume / print mode                        | 1 | implemented |
 | 09  | Maintenance autopilot (cron keepalive, dead-code removal) | — | implemented |
+| 10  | Hosted multi-user portfolios (bilko.run)   | — | implemented |
+| 11  | Hosted claim + upgrade flow (Clerk, Stripe) | — | implemented |
+| 12  | Self-serve SaaS: landing, repo picker, billing return, résumé CTA | — | implemented |
 | 13  | bilko.run observability tagging: data-track, screen views, flows | — | implemented (not yet published) |
 
-All v3.0 + v3.1 PRDs landed. git-viewer is a personal front page with no hosted or paid features.
+All v3.0 + v3.1 PRDs landed.
 
 ## v3.2 — Tabs
 

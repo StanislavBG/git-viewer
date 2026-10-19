@@ -106,6 +106,30 @@ bilko-host__publish_static_project { slug: 'git-viewer', distPath: '<absolute pa
 The MCP commits the bytes into `Bilko/public/projects/git-viewer/` and pushes
 both host remotes; Render auto-deploys within ~minute.
 
+## Library (`@bilkobibitkov/git-viewer`)
+
+The pipeline is also published to npm as an ESM library (Node 18+) so hosts can build a portfolio for any GitHub user without this repo:
+
+```bash
+npm install @bilkobibitkov/git-viewer
+```
+
+```ts
+import { buildPortfolio } from '@bilkobibitkov/git-viewer';
+
+const { data, lockedCount } = await buildPortfolio({
+  user: 'octocat',
+  token: process.env.GITHUB_TOKEN,
+  maxProjects: 1,                 // repo cap, applied before per-repo fetches
+  allowlist: ['hello-world'],     // optional: repos to show, in order
+  writing: 'none',                // or 'profile-repo' to read <user>/<user>/writing/*.md
+});
+```
+
+`data` is the same `GitData` the dashboard reads from `data.json`; `lockedCount` is how many eligible repos the cap withheld. A nonexistent user rejects with an Octokit error whose `status` is `404`. Also exported: `selectRepos`, `PLAN_LIMITS`, `buildWritingFromFiles`, and the `GitData` / `PortfolioOptions` types.
+
+Releases: bump `version`, add a `CHANGELOG.md` entry, push a `v<version>` tag — `.github/workflows/release.yml` publishes with provenance (needs the `NPM_AUTOMATION_TOKEN` repo secret).
+
 ## Development
 
 ```bash
@@ -120,7 +144,7 @@ pnpm sync         # regenerate public/data.json from the GitHub API
 
 - GraphQL contributions (`contributionsCollection`) — REST `/commits` is
   enough and works without a PAT for forkers.
-- Auth, comments, write actions — read-only front page.
+- Auth, comments, write actions — read-only portfolio.
 
 See `docs/prds/` for the active roadmap (badges, streaks, repo health, etc.).
 
