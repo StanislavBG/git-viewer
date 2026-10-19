@@ -20,5 +20,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["src", "pipeline", "vite.config.ts"]
+  "include": ["src", "pipeline", "vite.config.ts"],
+  "exclude": ["pipeline/lib-export.test.ts", "dist-lib"]
 }
