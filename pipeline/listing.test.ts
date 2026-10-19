@@ -5,7 +5,15 @@ import { PLAN_LIMITS } from './aggregate/select-repos.js';
 
 const { listing } = JSON.parse(
   readFileSync(new URL('../bilko.listing.json', import.meta.url), 'utf8'),
-) as { listing: { metric: string; detail: string; talkingPoints: string[] } };
+) as {
+  listing: {
+    metric: string;
+    metricLabel: string;
+    detail: string;
+    talkingPoints: string[];
+    avoidClaims: string[];
+  };
+};
 
 const STALE = /top 3|3 projects/i;
 
@@ -20,4 +28,17 @@ test('listing detail has no stale free-tier count', () => {
 
 test('listing talkingPoints have no stale free-tier count', () => {
   for (const point of listing.talkingPoints) assert.doesNotMatch(point, STALE);
+});
+
+test('listing states public repos only', () => {
+  assert.ok(listing.detail.includes('public repos only'), listing.detail);
+  assert.ok(listing.detail.includes('Private repos are never read or shown'), listing.detail);
+  assert.ok(listing.talkingPoints.some((p) => p.startsWith('Public data only')));
+  assert.ok(listing.avoidClaims.includes('Shows, reads or includes private repositories'));
+});
+
+test('listing respects registry limits', () => {
+  assert.ok(listing.talkingPoints.length <= 5);
+  assert.ok(listing.avoidClaims.length <= 5);
+  assert.ok(listing.metricLabel.length <= 24, listing.metricLabel);
 });
