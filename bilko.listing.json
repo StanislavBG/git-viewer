@@ -1,7 +1,7 @@
 {
   "listing": {
-    "detail": "Type a GitHub username on bilko.run and get a hosted portfolio plus printable résumé, ranked by recency and activity. Free: your top 3 projects, rebuilt at most once a day when viewed. $5/mo: pick up to 12 repos, refreshed daily.",
-    "metric": "3 free · 12 paid",
+    "detail": "Type a GitHub username on bilko.run and get a hosted portfolio plus printable résumé, ranked by recency and activity. Free: your top project, rebuilt at most once a day when viewed. $5/mo: pick up to 12 repos, refreshed daily.",
+    "metric": "1 free · 12 paid",
     "metricLabel": "repos per portfolio",
     "lang": "TypeScript",
     "audience": "Developers who want their GitHub activity to double as a portfolio.",
@@ -9,7 +9,7 @@
       "Type your GitHub username at bilko.run/projects/git-viewer/ — no install, no signup to see it.",
       "Turns your public GitHub repos into a portfolio page and a print-ready résumé.",
       "Ranks repos by recency and activity.",
-      "Free shows your top 3 projects, rebuilt at most once a day when someone views it.",
+      "Free shows your top project, rebuilt at most once a day when someone views it.",
       "$5/mo lets you pick up to 12 repos and refreshes them daily."
     ],
     "offering": "saas",
@@ -18,6 +18,7 @@
     "avoidClaims": [
       "Updates instantly when you push code",
       "Shows every public repo on the free tier",
+      "Shows more than one project on the free tier",
       "It is a local tool you have to install",
       "Fully free with no paid tier"
     ],
