@@ -1,5 +1,6 @@
 {
-  "name": "@bilkobibitkov/git-viewer",
+  "name": "git-viewer",
+  "private": true,
   "version": "0.1.1",
   "description": "Build a GitHub portfolio dataset (heatmap, projects, streaks, activity) for any user — the engine behind git-viewer.",
   "type": "module",
@@ -13,33 +14,6 @@
   "bugs": {
     "url": "https://github.com/StanislavBG/git-viewer/issues"
   },
-  "keywords": [
-    "bilko",
-    "github",
-    "portfolio",
-    "heatmap",
-    "octokit"
-  ],
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "main": "dist-lib/pipeline/index.js",
-  "types": "dist-lib/pipeline/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist-lib/pipeline/index.d.ts",
-      "import": "./dist-lib/pipeline/index.js"
-    }
-  },
-  "files": [
-    "dist-lib",
-    "LICENSE",
-    "README.md",
-    "CHANGELOG.md"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/emit-manifest.mjs",
@@ -47,9 +21,7 @@
     "preview": "vite preview",
     "sync": "tsx pipeline/sync.ts",
     "typecheck": "tsc --noEmit",
-    "build:lib": "rm -rf dist-lib && tsc -p tsconfig.lib.json",
-    "test": "node --import tsx --test src/data/tenant.test.ts src/data/claim.test.ts src/data/landing.test.ts src/data/repos.test.ts src/data/telemetry.test.ts pipeline/portfolio.test.ts pipeline/aggregate/select-repos.test.ts pipeline/listing.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
-    "prepublishOnly": "pnpm typecheck && pnpm test"
+    "test": "node --import tsx --test src/data/tenant.test.ts src/data/claim.test.ts src/data/landing.test.ts src/data/repos.test.ts src/data/telemetry.test.ts pipeline/portfolio.test.ts pipeline/aggregate/select-repos.test.ts pipeline/listing.test.ts"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.2",
