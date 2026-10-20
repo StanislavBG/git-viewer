@@ -78,3 +78,7 @@ export function parseTenantResponse(httpStatus: number, body: unknown): TenantRe
       throw new Error(`Hosted API returned unexpected HTTP status ${httpStatus}`);
   }
 }
+
+export function isEmptyActivity(data: GitData): boolean {
+  return data.totalCommitsYear === 0 && data.heatmap.every((d) => d.count <= 0);
+}

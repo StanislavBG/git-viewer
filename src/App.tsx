@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Landing } from './components/Landing';
 import { isLandingMode } from './data/landing';
+import { isEmptyActivity } from './data/tenant';
 import { GitDataProvider, useGitData, useGitDataState, useTenant } from './data/loader';
 import { markBuildPending, takeBuildPending, trackFlow, trackScreen } from './data/telemetry';
 import { RESUME_ARTIFACT } from './components/HostedActions';
@@ -52,6 +53,14 @@ function OverviewTab({
   return (
     <div className="shell">
       {showPipeline && tenant === null && <PipelineStrip />}
+      {tenant !== null && isEmptyActivity(data) && (
+        <p className="empty-notice" role="note">
+          No public commits in the last 12 months for @{tenant.login}. Git Viewer is built from a
+          person's own public commits — organizations and inactive accounts show up empty. Try a
+          person's username or a link to one of their repos.{' '}
+          <a href={window.location.pathname}>Back to start</a>
+        </p>
+      )}
       <Hero />
       <HeadlineStrip />
       <Achievements />

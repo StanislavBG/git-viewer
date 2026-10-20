@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogin, rawTenantParam, tenantApiUrl, parseTenantResponse } from './tenant.js';
+import { parseLogin, rawTenantParam, tenantApiUrl, parseTenantResponse, isEmptyActivity } from './tenant.js';
+import type { GitData } from '../types.js';
 
 test('parseLogin accepts a valid login', () => {
   assert.equal(parseLogin('?u=StanislavBG'), 'StanislavBG');
@@ -100,4 +101,14 @@ test('parseTenantResponse 503 throws for unavailable and error', () => {
   assert.throws(() => parseTenantResponse(503, { status: 'unavailable' }), /temporarily unavailable/);
   assert.throws(() => parseTenantResponse(503, { status: 'error' }), /generation failed/);
   assert.throws(() => parseTenantResponse(503, null), /generation failed/);
+});
+
+test('isEmptyActivity is true only with zero commits and an all-zero heatmap', () => {
+  const day = (count: number) => ({ date: '2026-01-01', count, projects: [] });
+  const mk = (total: number, counts: number[]) =>
+    ({ totalCommitsYear: total, heatmap: counts.map(day) }) as unknown as GitData;
+  assert.equal(isEmptyActivity(mk(0, [0, 0, -1])), true);
+  assert.equal(isEmptyActivity(mk(0, [])), true);
+  assert.equal(isEmptyActivity(mk(5, [0, 0])), false);
+  assert.equal(isEmptyActivity(mk(0, [0, 1])), false);
 });
