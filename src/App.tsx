@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Landing } from './components/Landing';
 import { isLandingMode } from './data/landing';
-import { GitDataProvider, useGitData, useGitDataState } from './data/loader';
+import { GitDataProvider, useGitData, useGitDataState, useTenant } from './data/loader';
 import { markBuildPending, takeBuildPending, trackFlow, trackScreen } from './data/telemetry';
 import { RESUME_ARTIFACT } from './components/HostedActions';
 import { useTweaks } from './state/tweaks';
@@ -48,9 +48,10 @@ function OverviewTab({
   onProject: (id: string) => void;
 }) {
   const data = useGitData();
+  const tenant = useTenant();
   return (
     <div className="shell">
-      {showPipeline && <PipelineStrip />}
+      {showPipeline && tenant === null && <PipelineStrip />}
       <Hero />
       <HeadlineStrip />
       <Achievements />

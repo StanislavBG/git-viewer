@@ -1,5 +1,15 @@
 import { useGitData } from '../data/loader';
 
+function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => Array.from(w)[0])
+    .join('')
+    .toUpperCase();
+}
+
 export function Hero() {
   const { developer, totalCommitsYear, projects, languages30 } = useGitData();
   const stars = projects.reduce((s, p) => s + p.stars, 0);
@@ -22,7 +32,9 @@ export function Hero() {
                 ? { backgroundImage: `url(${developer.avatarUrl})`, backgroundSize: 'cover' }
                 : undefined
             }
-          ></div>
+          >
+            {!developer.avatarUrl && <span className="initials">{initialsOf(developer.name)}</span>}
+          </div>
           <div>
             <div className="eyebrow" style={{ marginBottom: 8 }}>
               R&D log · est. {developer.joined}
