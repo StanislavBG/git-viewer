@@ -86,6 +86,17 @@ export function checkoutReturnUrls(href: string): { successUrl: string; cancelUr
   return { successUrl: withFlag('success'), cancelUrl: withFlag('cancel') };
 }
 
+export function githubSignInReturnUrl(href: string): string {
+  const u = new URL(href);
+  u.searchParams.delete('checkout');
+  u.searchParams.set('claim', '1');
+  return u.toString();
+}
+
+export function shouldAutoClaim(search: string): boolean {
+  return new URLSearchParams(search).get('claim') === '1';
+}
+
 export function parseCheckoutFlag(search: string): 'success' | 'cancel' | null {
   const v = new URLSearchParams(search).get('checkout');
   return v === 'success' || v === 'cancel' ? v : null;

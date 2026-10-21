@@ -12,8 +12,27 @@ import {
   parsePortalResponse,
   upgradeStep,
   githubLinkState,
+  githubSignInReturnUrl,
+  shouldAutoClaim,
   type ClaimResult,
 } from './claim.js';
+
+test('githubSignInReturnUrl sets claim=1 and drops checkout', () => {
+  assert.equal(
+    githubSignInReturnUrl('https://bilko.run/projects/git-viewer/?u=StanislavBG&checkout=success'),
+    'https://bilko.run/projects/git-viewer/?u=StanislavBG&claim=1',
+  );
+  assert.equal(githubSignInReturnUrl('https://bilko.run/p/?u=octo'), 'https://bilko.run/p/?u=octo&claim=1');
+  assert.equal(githubSignInReturnUrl('https://bilko.run/p/?claim=0&u=octo'), 'https://bilko.run/p/?claim=1&u=octo');
+});
+
+test('shouldAutoClaim is true only when claim=1', () => {
+  assert.equal(shouldAutoClaim('?u=octo&claim=1'), true);
+  assert.equal(shouldAutoClaim('claim=1'), true);
+  assert.equal(shouldAutoClaim('?claim=0'), false);
+  assert.equal(shouldAutoClaim('?u=octo'), false);
+  assert.equal(shouldAutoClaim(''), false);
+});
 
 test('upgradeStep gates checkout on a successful claim', () => {
   const claimed: ClaimResult = { status: 'claimed', login: 'octo', tier: 'free', allowlist: [] };

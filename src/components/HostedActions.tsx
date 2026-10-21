@@ -7,6 +7,8 @@ import {
   buildPortalRequest,
   checkoutReturnUrls,
   githubLinkState,
+  githubSignInReturnUrl,
+  shouldAutoClaim,
   type ExternalAccount,
   parseCheckoutFlag,
   parseCheckoutResponse,
@@ -18,8 +20,8 @@ import { version as APP_VERSION } from '../../package.json';
 
 type ClerkLike = {
   load: () => Promise<void>;
-  openSignIn: () => void;
-  openUserProfile: () => void;
+  openSignIn: (props?: { forceRedirectUrl?: string; signUpForceRedirectUrl?: string }) => void;
+  signOut: () => Promise<void>;
   addListener: (cb: () => void) => void;
   session?: { getToken: () => Promise<string | null> } | null;
   user?: {
@@ -43,6 +45,7 @@ declare global {
 let clerkPromise: Promise<ClerkLike> | null = null;
 // useHostedActions mounts once per ClaimBar/UpgradeButton; the Stripe return is one event.
 let checkoutReturnTracked = false;
+let autoClaimStarted = false;
 
 function injectClerkScript(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -82,7 +85,7 @@ function linkedGithubName(accounts: ExternalAccount[] | undefined): string | nul
   return accounts?.find((a) => a.provider === 'oauth_github' || a.provider === 'github')?.username ?? null;
 }
 
-export function useHostedActions() {
+export function useHostedActions({ autoClaim = false }: { autoClaim?: boolean } = {}) {
   const tenant = useTenant();
   const [clerk, setClerk] = useState<ClerkLike | null>(null);
   const [signedIn, setSignedIn] = useState(false);
@@ -124,10 +127,18 @@ export function useHostedActions() {
 
   const signIn = useCallback(() => clerk?.openSignIn(), [clerk]);
 
-  const linkGithub = useCallback(() => {
+  const linkGithub = useCallback(async () => {
+    if (!clerk || !tenant) return;
     trackFlow('claim', 'link-github');
-    clerk?.openUserProfile();
-  }, [clerk]);
+    try {
+      await clerk.signOut();
+      const returnUrl = githubSignInReturnUrl(window.location.href);
+      clerk.openSignIn({ forceRedirectUrl: returnUrl, signUpForceRedirectUrl: returnUrl });
+      setMsg({ kind: 'ok', text: `Choose 'Continue with GitHub' and use the account @${tenant.login}.` });
+    } catch (e) {
+      setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
+    }
+  }, [clerk, tenant]);
 
   const claim = useCallback(async (allowlist?: string[]): Promise<boolean> => {
     if (!clerk || !tenant) return false;
@@ -178,6 +189,17 @@ export function useHostedActions() {
     }
     return claimed;
   }, [clerk, tenant]);
+
+  useEffect(() => {
+    if (!autoClaim || autoClaimStarted || !clerk || !tenant || !signedIn || !clerk.user) return;
+    if (!shouldAutoClaim(window.location.search)) return;
+    autoClaimStarted = true;
+    void claim().finally(() => {
+      const u = new URL(window.location.href);
+      u.searchParams.delete('claim');
+      window.history.replaceState(window.history.state, '', u.toString());
+    });
+  }, [autoClaim, clerk, tenant, signedIn, claim]);
 
   const upgrade = useCallback(async (source: string) => {
     if (!clerk) return;
@@ -254,7 +276,7 @@ export function useHostedActions() {
 }
 
 export function ClaimBar() {
-  const h = useHostedActions();
+  const h = useHostedActions({ autoClaim: true });
   const { projects } = useGitData();
   const [picking, setPicking] = useState(false);
   const offerShown = h.signedIn && h.tenant?.tier === 'free';
@@ -310,7 +332,7 @@ export function ClaimBar() {
           {h.githubPrompt.state === 'other-account' && h.githubPrompt.linked
             ? `Your linked GitHub account is ${h.githubPrompt.linked}, but this portfolio belongs to ${h.tenant.login}. `
             : `Link the GitHub account ${h.tenant.login} to claim this portfolio. `}
-          <button data-track="claim-link-github" onClick={h.linkGithub}>Connect GitHub</button>
+          <button data-track="claim-link-github" onClick={() => void h.linkGithub()}>Connect GitHub</button>
         </span>
       )}
       {h.msg && <span className={`claim-msg ${h.msg.kind}`} data-track-redact>{h.msg.text}</span>}
