@@ -42,3 +42,26 @@ test('listing respects registry limits', () => {
   assert.ok(listing.avoidClaims.length <= 5);
   assert.ok(listing.metricLabel.length <= 24, listing.metricLabel);
 });
+
+test('listing prices are yearly, never monthly', () => {
+  const strings = [
+    listing.metric,
+    listing.metricLabel,
+    listing.detail,
+    ...listing.talkingPoints,
+    ...listing.avoidClaims,
+  ];
+  for (const s of strings) {
+    assert.ok(!s.includes('/mo'), s);
+    assert.ok(!/per month/i.test(s), s);
+  }
+  assert.ok(listing.detail.includes('$5/yr'), listing.detail);
+});
+
+test('UI price copy has no $5/mo', () => {
+  for (const f of ['../src/components/Landing.tsx', '../src/components/HostedActions.tsx']) {
+    const src = readFileSync(new URL(f, import.meta.url), 'utf8');
+    assert.ok(!src.includes('$5/mo'), f);
+    assert.ok(!src.includes('per month'), f);
+  }
+});

@@ -135,7 +135,7 @@ export function Landing() {
           <div className="landing-plan pro">
             <h3>Pro</h3>
             <div className="landing-price">
-              $5<span>/mo</span>
+              $5<span>/yr</span>
             </div>
             <ul>
               {PRO.map((f) => (

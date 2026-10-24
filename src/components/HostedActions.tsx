@@ -317,7 +317,7 @@ export function ClaimBar() {
                 void h.upgrade('claim-bar');
               }}
             >
-              Upgrade — $5/mo
+              Upgrade — $5/yr
             </button>
           )}
           {h.tenant.tier === 'paid' && (
@@ -372,7 +372,7 @@ export function UpgradeButton() {
         void (h.signedIn ? h.upgrade('projects-tab') : h.signIn());
       }}
     >
-      {h.signedIn ? 'Unlock all projects — $5/mo' : 'Sign in to unlock all projects — $5/mo'}
+      {h.signedIn ? 'Unlock all projects — $5/yr' : 'Sign in to unlock all projects — $5/yr'}
     </button>
   );
 }
