@@ -134,7 +134,7 @@ export function useHostedActions({ autoClaim = false }: { autoClaim?: boolean } 
       await clerk.signOut();
       const returnUrl = githubSignInReturnUrl(window.location.href);
       clerk.openSignIn({ forceRedirectUrl: returnUrl, signUpForceRedirectUrl: returnUrl });
-      setMsg({ kind: 'ok', text: `Choose 'Continue with GitHub' and use the account @${tenant.login}.` });
+      setMsg({ kind: 'ok', text: `Choose 'Continue with GitHub' and use ${tenant.ownerLogin !== tenant.login ? 'the GitHub account that owns this portfolio' : `the account @${tenant.login}`}.` });
     } catch (e) {
       setMsg({ kind: 'err', text: e instanceof Error ? e.message : String(e) });
     }
@@ -148,7 +148,7 @@ export function useHostedActions({ autoClaim = false }: { autoClaim?: boolean } 
     setMsg(null);
     setGithubPrompt(null);
     const accounts = clerk.user?.externalAccounts;
-    const preState = accounts ? githubLinkState(accounts, tenant.login) : 'linked';
+    const preState = accounts ? githubLinkState(accounts, tenant.ownerLogin) : 'linked';
     if (preState !== 'linked') {
       trackFlow('claim', 'fail', { mode, reason: 'github-not-linked' });
       setGithubPrompt({ state: preState, linked: linkedGithubName(accounts) });
@@ -162,7 +162,7 @@ export function useHostedActions({ autoClaim = false }: { autoClaim?: boolean } 
         clerk.openSignIn();
         return false;
       }
-      const req = buildClaimRequest({ origin: window.location.origin, login: tenant.login, token, allowlist });
+      const req = buildClaimRequest({ origin: window.location.origin, login: tenant.ownerLogin, token, allowlist });
       const r = await fetch(req.url, req.init);
       const res = parseClaimResponse(r.status, await r.json().catch(() => null));
       if (res.status === 'claimed') {
@@ -287,6 +287,7 @@ export function ClaimBar() {
     if (picking) trackScreen('repo-picker');
   }, [picking]);
   if (!h.tenant) return null;
+  const persona = h.tenant.ownerLogin !== h.tenant.login;
   const resumeUrl = new URL(window.location.href);
   resumeUrl.searchParams.set('print', '1');
   resumeUrl.searchParams.delete('checkout');
@@ -330,15 +331,15 @@ export function ClaimBar() {
       {h.githubPrompt && (
         <span className="claim-msg err" data-track-redact>
           {h.githubPrompt.state === 'other-account' && h.githubPrompt.linked
-            ? `Your linked GitHub account is ${h.githubPrompt.linked}, but this portfolio belongs to ${h.tenant.login}. `
-            : `Link the GitHub account ${h.tenant.login} to claim this portfolio. `}
+            ? `Your linked GitHub account is ${h.githubPrompt.linked}, but this portfolio belongs to ${persona ? 'the GitHub account that owns this portfolio' : h.tenant.login}. `
+            : `Link ${persona ? 'the GitHub account that owns this portfolio' : `the GitHub account ${h.tenant.login}`} to claim this portfolio. `}
           <button data-track="claim-link-github" onClick={() => void h.linkGithub()}>Connect GitHub</button>
         </span>
       )}
       {h.msg && <span className={`claim-msg ${h.msg.kind}`} data-track-redact>{h.msg.text}</span>}
       {picking && (
         <RepoPicker
-          login={h.tenant.login}
+          login={h.tenant.ownerLogin}
           initial={projects.map((p) => p.name)}
           onSave={async (names) => {
             if (await h.claim(names)) {
