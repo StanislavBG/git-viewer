@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { GitData } from '../types';
+import { maskPersona, resolvePersona } from './persona';
 import { parseLogin, parseTenantResponse, rawTenantParam, tenantApiUrl } from './tenant';
 
 export type Tenant = {
   login: string;
+  ownerLogin: string;
   tier: 'free' | 'paid';
   lockedCount: number;
   updatedAt: string;
@@ -72,11 +74,19 @@ export function GitDataProvider({ children }: { children: ReactNode }) {
       };
     }
 
+    const persona = resolvePersona(login);
+    if (persona && login !== persona.slug) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('u', persona.slug);
+      history.replaceState(history.state, '', url.toString());
+    }
+    const apiLogin = persona ? persona.githubLogin : login;
+
     let attempts = 0;
     const poll = async () => {
       attempts += 1;
       try {
-        const r = await fetch(tenantApiUrl(login, window.location.origin), { cache: 'no-cache' });
+        const r = await fetch(tenantApiUrl(apiLogin, window.location.origin), { cache: 'no-cache' });
         let body: unknown;
         try {
           body = await r.json();
@@ -88,9 +98,10 @@ export function GitDataProvider({ children }: { children: ReactNode }) {
         if (res.status === 'ready') {
           setState({
             status: 'ready',
-            data: res.data,
+            data: persona ? maskPersona(res.data, persona) : res.data,
             tenant: {
-              login: res.login,
+              login: persona ? persona.slug : res.login,
+              ownerLogin: persona ? persona.githubLogin : res.login,
               tier: res.tier,
               lockedCount: res.lockedCount,
               updatedAt: res.updatedAt,

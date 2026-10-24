@@ -48,7 +48,7 @@
     "sync": "tsx pipeline/sync.ts",
     "typecheck": "tsc --noEmit",
     "build:lib": "rm -rf dist-lib && tsc -p tsconfig.lib.json",
-    "test": "node --import tsx --test src/data/tenant.test.ts src/data/claim.test.ts src/data/landing.test.ts src/data/repos.test.ts src/data/telemetry.test.ts pipeline/portfolio.test.ts pipeline/aggregate/select-repos.test.ts pipeline/listing.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
+    "test": "node --import tsx --test src/data/tenant.test.ts src/data/claim.test.ts src/data/landing.test.ts src/data/persona.test.ts src/data/repos.test.ts src/data/telemetry.test.ts pipeline/portfolio.test.ts pipeline/aggregate/select-repos.test.ts pipeline/listing.test.ts && pnpm build:lib && node --test pipeline/lib-export.test.ts",
     "prepublishOnly": "pnpm typecheck && pnpm test"
   },
   "dependencies": {

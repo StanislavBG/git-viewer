@@ -45,5 +45,5 @@ test('normalizeLoginInput rejects invalid input', () => {
 });
 
 test('exampleLogins lists the featured profiles', () => {
-  assert.deepEqual([...exampleLogins], ['StanislavBG', 'torvalds', 'gaearon']);
+  assert.deepEqual([...exampleLogins], ['BilkoBibitkov', 'torvalds', 'gaearon']);
 });

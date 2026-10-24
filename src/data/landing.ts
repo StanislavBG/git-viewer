@@ -2,7 +2,7 @@ import { LOGIN_RE } from './tenant.js';
 
 const NON_LANDING_HOSTS = new Set(['stanislavbg.github.io', 'localhost', '127.0.0.1']);
 
-export const exampleLogins: readonly string[] = ['StanislavBG', 'torvalds', 'gaearon'];
+export const exampleLogins: readonly string[] = ['BilkoBibitkov', 'torvalds', 'gaearon'];
 
 export function isLandingMode(hostname: string, search: string): boolean {
   const params = new URLSearchParams(search);
