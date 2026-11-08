@@ -22,6 +22,7 @@ Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, 
 - `pnpm build` — emit `dist/`.
 - `pnpm typecheck` — `tsc --noEmit` across `src/` + `pipeline/`.
 - `pnpm test` — node:test unit tests, then `build:lib` + an import check of the compiled `dist-lib/`.
+- `pnpm usage --days N` — read-only usage report: Markdown to stdout, JSON to `.cache/usage/`; the Session Manager "Usage" macro runs it. See `docs/prds/14-usage-report.md`.
 
 ## npm library
 The repo root is also the npm package `@bilkobibitkov/git-viewer` (ESM, `dist-lib/`, entry `pipeline/index.ts`); bilko.run's hosted `?u=` portfolios call its `buildPortfolio`. Only `@octokit/rest` and `p-limit` are runtime `dependencies` — react, dotenv, vite etc. stay in `devDependencies`. Release: bump `version` + `CHANGELOG.md`, push tag `v<ver>`; `release.yml` publishes with provenance via the `NPM_AUTOMATION_TOKEN` repo secret (not set yet — 0.1.0 was published locally).
