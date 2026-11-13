@@ -190,11 +190,11 @@ async function fetchFlows(get: Get, days: number, realFromSessions: number) {
   return { realSessions, allSessions, telemetryOnlyReal: Math.max(0, realSessions - realFromSessions) };
 }
 
-async function fetchTraffic(get: Get, days: number) {
-  const body = await get(`/api/admin/traffic?slug=git-viewer&days=${days}`);
+export async function fetchTraffic(get: Get, days: number) {
+  const body = await get(`/api/admin/traffic?slug=git-viewer&days=${days}&mine=exclude`);
   return {
-    humanVisitors: num(body.visitors?.human),
-    humanSingleHit: num(body.visitors?.humanSingleHit),
+    humanVisitors: num(body.totals?.visitors),
+    humanSingleHit: num(body.quality?.singleHitVisitors),
     byDayUtc: ((body.byDay ?? []) as Json[]).map((d) => ({ date: String(d.date), hits: num(d.hits), visitors: num(d.visitors) })),
   };
 }
