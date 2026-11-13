@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isLandingMode, normalizeLoginInput, exampleLogins } from './landing.js';
+import {
+  isLandingMode,
+  normalizeLoginInput,
+  exampleLogins,
+  communityPortfolios,
+  avatarUrl,
+  portfolioHref,
+  formatBuiltOn,
+} from './landing.js';
+import { LOGIN_RE } from './tenant.js';
 
 test('isLandingMode is false when a non-empty u param is present', () => {
   assert.equal(isLandingMode('bilko.run', '?u=octocat'), false);
@@ -46,4 +55,46 @@ test('normalizeLoginInput rejects invalid input', () => {
 
 test('exampleLogins lists the featured profiles', () => {
   assert.deepEqual([...exampleLogins], ['BilkoBibitkov', 'torvalds', 'gaearon']);
+});
+
+test('avatarUrl points at avatars.githubusercontent.com with a size', () => {
+  assert.equal(avatarUrl('bidyut10'), 'https://avatars.githubusercontent.com/bidyut10?s=96');
+  assert.equal(avatarUrl('octocat', 48), 'https://avatars.githubusercontent.com/octocat?s=48');
+});
+
+test('portfolioHref links to the ?u= page', () => {
+  assert.equal(portfolioHref('bidyut10'), '?u=bidyut10');
+});
+
+test('formatBuiltOn formats real dates and passes through anything else', () => {
+  assert.equal(formatBuiltOn('2026-11-07'), 'Nov 7, 2026');
+  assert.equal(formatBuiltOn('2026-01-01'), 'Jan 1, 2026');
+  assert.equal(formatBuiltOn('2026-02-30'), '2026-02-30');
+  assert.equal(formatBuiltOn('soon'), 'soon');
+});
+
+const isRealIsoDate = (s: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(s) && formatBuiltOn(s) !== s;
+
+test('communityPortfolios entries are valid, unique, and not example logins', () => {
+  const seen = new Set<string>();
+  const examples = new Set(exampleLogins.map((l) => l.toLowerCase()));
+  for (const p of communityPortfolios) {
+    assert.ok(LOGIN_RE.test(p.login), `invalid login ${p.login}`);
+    const key = p.login.toLowerCase();
+    assert.ok(!seen.has(key), `duplicate login ${p.login}`);
+    seen.add(key);
+    assert.ok(!examples.has(key), `${p.login} is an example login`);
+    assert.ok(isRealIsoDate(p.builtOn), `bad builtOn ${p.builtOn}`);
+  }
+});
+
+test('communityPortfolios is ordered newest builtOn first', () => {
+  for (let i = 1; i < communityPortfolios.length; i++) {
+    assert.ok(communityPortfolios[i - 1].builtOn >= communityPortfolios[i].builtOn);
+  }
+});
+
+test('communityPortfolios includes bidyut10', () => {
+  const entry = communityPortfolios.find((p) => p.login === 'bidyut10');
+  assert.deepEqual(entry, { login: 'bidyut10', name: 'Bidyut Kundu', builtOn: '2026-11-07' });
 });
