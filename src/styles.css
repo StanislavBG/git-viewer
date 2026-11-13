@@ -1887,6 +1887,14 @@ body.density-compact .hero h1 { font-size: 52px; }
 .landing-error { margin-top: 10px; font-family: var(--mono); font-size: 12px; color: oklch(0.72 0.12 30); }
 .landing-examples { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
 .landing-examples a { display: block; font-family: var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; text-decoration: none; }
+.landing-community-group h3, .landing-examples-heading { margin-bottom: 10px; }
+.landing-community { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.landing-community a { display: grid; grid-template-columns: 48px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; align-items: center; background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: 6px; padding: 12px; text-decoration: none; height: 100%; }
+.landing-community a:hover, .landing-community a:focus-visible { border-color: var(--accent); }
+.landing-community-avatar { grid-row: 1 / span 2; display: block; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: var(--bg-card-2); }
+.landing-community img { display: block; width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card-2); }
+.landing-community-name { color: var(--ink); overflow-wrap: anywhere; align-self: end; }
+.landing-community-meta { font-family: var(--mono); font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; align-self: start; }
 .landing-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; counter-reset: step; }
 .landing-steps li { counter-increment: step; background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: 6px; padding: 16px; }
 .landing-steps li::before { content: counter(step); display: block; font-family: var(--mono); color: var(--accent); margin-bottom: 8px; }
@@ -1908,6 +1916,7 @@ body.density-compact .hero h1 { font-size: 52px; }
   .landing { padding: 32px 16px 24px; }
   .landing-form { flex-direction: column; }
   .landing-steps, .landing-plans { grid-template-columns: 1fr; }
+  .landing-community { grid-template-columns: 1fr; }
 }
 
 .repo-picker { position: fixed; inset: 0; margin: auto; width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); height: fit-content; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--line); border-radius: 6px; z-index: 50; box-sizing: border-box; overflow: hidden; }

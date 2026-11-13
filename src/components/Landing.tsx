@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { exampleLogins, normalizeLoginInput } from '../data/landing';
+import {
+  avatarUrl,
+  communityPortfolios,
+  exampleLogins,
+  formatBuiltOn,
+  normalizeLoginInput,
+  portfolioHref,
+} from '../data/landing';
 import { checkoutProps, markBuildPending, trackFlow, trackScreen } from '../data/telemetry';
 
 const STEPS = [
@@ -61,7 +68,7 @@ export function Landing() {
     setError(false);
     trackFlow('build-portfolio', 'start', { source: 'landing' });
     markBuildPending();
-    window.location.search = '?u=' + encodeURIComponent(login);
+    window.location.search = portfolioHref(login);
   };
 
   const focusInput = () => inputRef.current?.focus();
@@ -99,10 +106,41 @@ export function Landing() {
 
       <section aria-labelledby="landing-example">
         <h2 id="landing-example">See an example</h2>
+        {communityPortfolios.length > 0 && (
+          <>
+            <div className="landing-community-group" data-track-redact>
+              <h3 id="landing-community">Built by our users</h3>
+              <ul className="landing-community" aria-labelledby="landing-community">
+                {communityPortfolios.map((p, i) => (
+                  <li key={p.login}>
+                    <a href={portfolioHref(p.login)} data-track={`community-open-${i + 1}`}>
+                      <span className="landing-community-avatar">
+                        <img
+                          src={avatarUrl(p.login)}
+                          alt=""
+                          width={48}
+                          height={48}
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                        />
+                      </span>
+                      <span className="landing-community-name">{p.name ?? p.login}</span>
+                      <span className="landing-community-meta">
+                        @{p.login} · Built {formatBuiltOn(p.builtOn)}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <h3 className="landing-examples-heading">More examples</h3>
+          </>
+        )}
         <ul className="landing-examples">
           {exampleLogins.map((login, i) => (
             <li key={login}>
-              <a href={'?u=' + encodeURIComponent(login)} data-track={`example-open-${i + 1}`}>{login}</a>
+              <a href={portfolioHref(login)} data-track={`example-open-${i + 1}`}>{login}</a>
             </li>
           ))}
         </ul>
