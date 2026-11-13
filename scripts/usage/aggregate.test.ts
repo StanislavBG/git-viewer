@@ -8,6 +8,7 @@ import {
   classifySession,
   flowSteps,
   matchBuildToProfile,
+  openedExample,
   pacificDay,
   pacificTime,
   portfolioUrl,
@@ -17,6 +18,7 @@ import {
   utmFromTimeline,
   type BurrowReply,
   type DayRow,
+  type OpenedExample,
   type ProfileRow,
   type RealVisitor,
   type Section,
@@ -37,6 +39,10 @@ function ev(flow: string, step: string, ts = 0, app = 'git-viewer'): TimelineIte
 
 function view(ts: number, path: string | null, referrer: string | null = null): TimelineItem {
   return { ts, kind: 'view', path, referrer };
+}
+
+function click(ts: number, trackName: string | null, label: string | null = null): TimelineItem {
+  return { ts, kind: 'click', path: '/projects/git-viewer/', label, trackName };
 }
 
 function session(fields: Pick<UsageSession, 'sessionId' | 'startedAt'> & Partial<UsageSession>): UsageSession {
@@ -290,6 +296,48 @@ test('stripEmails scrubs a whole UsageReport without changing its shape', () => 
   });
 });
 
+test('openedExample (a): example click followed by a load names the example login', () => {
+  const t = 1_794_336_827_661;
+  const timeline = [click(t, 'example-open-1', 'BilkoBibitkov'), ev('portfolio-load', 'start', t + 400), ev('portfolio-load', 'success', t + 2_000)];
+  const expected: OpenedExample = { slot: 'example-open-1', login: 'BilkoBibitkov', url: 'https://bilko.run/projects/git-viewer/?u=BilkoBibitkov' };
+  assert.deepEqual(openedExample(timeline), expected);
+});
+
+test('openedExample accepts a whole-second start up to 1000 ms before the click', () => {
+  const t = 1_794_336_827_661;
+  assert.deepEqual(openedExample([click(t, 'example-open-1', 'BilkoBibitkov'), ev('portfolio-load', 'start', 1_794_336_827_000)])?.login, 'BilkoBibitkov');
+  assert.equal(openedExample([click(t, 'example-open-1', 'BilkoBibitkov'), ev('portfolio-load', 'start', t - 1_001)]), null);
+});
+
+test('openedExample (b): community click has no recoverable login', () => {
+  const timeline = [click(1_000, 'community-open-1', ''), ev('portfolio-load', 'start', 1_500)];
+  assert.deepEqual(openedExample(timeline), { slot: 'community-open-1', login: null, url: null });
+});
+
+test('openedExample (c): example click with no load after it is null', () => {
+  const timeline = [ev('portfolio-load', 'start', 1_000), click(5_000, 'example-open-1', 'BilkoBibitkov')];
+  assert.equal(openedExample(timeline), null);
+});
+
+test('openedExample (d): a nav click is not an example open', () => {
+  assert.equal(openedExample([click(1_000, 'nav-projects', 'Projects'), ev('portfolio-load', 'start', 1_500)]), null);
+});
+
+test('openedExample (e): a label that is not a login leaves login and url null', () => {
+  const timeline = [click(1_000, 'example-open-2', 'Bidyut Kundu'), ev('portfolio-load', 'start', 1_500)];
+  assert.deepEqual(openedExample(timeline), { slot: 'example-open-2', login: null, url: null });
+});
+
+test('openedExample picks the latest counting click', () => {
+  const timeline = [
+    click(1_000, 'example-open-1', 'BilkoBibitkov'),
+    ev('portfolio-load', 'start', 1_200),
+    click(9_000, 'example-open-2', 'torvalds'),
+    ev('portfolio-load', 'start', 9_300),
+  ];
+  assert.equal(openedExample(timeline)?.login, 'torvalds');
+});
+
 test('buildRealVisitors lists real sessions in time order with login, page URL and burrow attribution', () => {
   const tReturning = at('2026-11-03T16:00:00Z');
   const tNew = at('2026-11-04T16:00:00Z');
@@ -334,7 +382,11 @@ test('buildRealVisitors lists real sessions in time order with login, page URL a
       sessionId: 's-returning',
       startedAt: tReturning,
       referrerHost: 't.co',
-      timeline: [ev('portfolio-load', 'success', tReturning + 10_000)],
+      timeline: [
+        click(tReturning + 5_000, 'example-open-1', 'BilkoBibitkov'),
+        ev('portfolio-load', 'start', tReturning + 5_000 - 661),
+        ev('portfolio-load', 'success', tReturning + 10_000),
+      ],
     }),
   ];
   const launchUtm: Utm = { source: 'burrow', campaign: 'launch' };
@@ -346,9 +398,10 @@ test('buildRealVisitors lists real sessions in time order with login, page URL a
       device: 'desktop',
       referrerHost: 't.co',
       utm: null,
-      steps: { 'portfolio-load.success': 1 },
+      steps: { 'portfolio-load.start': 1, 'portfolio-load.success': 1 },
       login: null,
       url: null,
+      openedExample: { slot: 'example-open-1', login: 'BilkoBibitkov', url: 'https://bilko.run/projects/git-viewer/?u=BilkoBibitkov' },
       burrow: fromReturning,
     },
     {
@@ -361,6 +414,7 @@ test('buildRealVisitors lists real sessions in time order with login, page URL a
       steps: { 'portfolio-load.generating': 1, 'portfolio-load.success': 2, 'build-portfolio.success': 1 },
       login: 'newbie',
       url: 'https://bilko.run/projects/git-viewer/?u=newbie',
+      openedExample: null,
       burrow: fromNew,
     },
     {
@@ -373,6 +427,7 @@ test('buildRealVisitors lists real sessions in time order with login, page URL a
       steps: { 'portfolio-load.generating': 1 },
       login: null,
       url: null,
+      openedExample: null,
       burrow: null,
     },
   ];
@@ -391,6 +446,7 @@ test('unmatchedBuilds lists recent non-showcase builds that no real visitor acco
     steps: {},
     login,
     url: login === null ? null : portfolioUrl(login),
+    openedExample: null,
     burrow: null,
   });
   const profiles = [

@@ -37,6 +37,7 @@ function fullReport(): UsageReport {
         steps: { 'portfolio-load.generating': 1, 'portfolio-load.success': 1 },
         login: 'example-user',
         url: portfolioUrl('example-user'),
+        openedExample: { slot: 'example-open-2', login: 'torvalds', url: portfolioUrl('torvalds') },
         burrow: { postId: 'p1', postedAt: replyAt, text: replyText, target: 'ExampleHandle', mode: 'one_detail', lane: 'established' },
       },
     ],
@@ -77,6 +78,19 @@ test('real visitor with portfolio url and burrow reply', () => {
   const burrowLine = `  - burrow reply to @ExampleHandle at ${pacificTime(replyAt)} (one_detail/established): "${replyText.slice(0, 140)}"`;
   assert.ok(md.includes(burrowLine), md);
   assert.ok(!md.includes(replyText.slice(0, 141)));
+});
+
+test('real visitor opened-example lines', () => {
+  const md = renderMarkdown(fullReport());
+  assert.ok(md.includes(`  - portfolio: ${portfolioUrl('example-user')}\n  - opened example: ${portfolioUrl('torvalds')}\n`), md);
+  const report = fullReport();
+  report.realVisitors = [
+    { ...report.realVisitors[0], openedExample: { slot: 'community-open-3', login: null, url: null } },
+    { ...report.realVisitors[0], sessionId: 's2', openedExample: null },
+  ];
+  const lines = renderMarkdown(report).split('\n');
+  assert.equal(lines.filter((l) => l === '  - opened community-open-3 (login not recorded)').length, 1);
+  assert.equal(lines.filter((l) => l.startsWith('  - opened')).length, 1);
 });
 
 test('portfolios section lists non-showcase rows and unmatched builds', () => {

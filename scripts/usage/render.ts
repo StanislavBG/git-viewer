@@ -82,6 +82,8 @@ function realVisitors(visitors: RealVisitor[]): string[] {
     const steps = Object.keys(v.steps).sort();
     lines.push(`  - steps: ${steps.length === 0 ? 'none' : steps.join(', ')}`);
     if (v.url !== null) lines.push(`  - portfolio: ${v.url}`);
+    if (v.openedExample?.url) lines.push(`  - opened example: ${v.openedExample.url}`);
+    else if (v.openedExample && v.openedExample.login === null) lines.push(`  - opened ${v.openedExample.slot} (login not recorded)`);
     if (v.burrow !== null) lines.push(burrowLine(v.burrow));
   }
   return lines;

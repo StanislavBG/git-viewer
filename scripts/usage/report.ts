@@ -139,6 +139,8 @@ function toTimelineItem(t: Json): TimelineItem {
     name: str(t.name),
     app: str(t.app),
     props: t.props && typeof t.props === 'object' ? (t.props as Record<string, unknown>) : null,
+    label: str(t.label),
+    trackName: str(t.track_name),
   };
 }
 

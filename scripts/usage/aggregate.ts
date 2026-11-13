@@ -1,3 +1,5 @@
+import { LOGIN_RE } from '../../src/data/tenant.js';
+
 export const PACIFIC_TZ = 'America/Los_Angeles';
 
 const GIT_VIEWER_APP = 'git-viewer';
@@ -55,6 +57,8 @@ export interface TimelineItem {
   name?: string | null;
   app?: string | null;
   props?: Record<string, unknown> | null;
+  label?: string | null;
+  trackName?: string | null;
 }
 
 export interface UsageSession {
@@ -255,6 +259,33 @@ export function stripEmails<T>(value: T): T {
   return scrubEmails(value) as T;
 }
 
+export interface OpenedExample {
+  slot: string;
+  login: string | null;
+  url: string | null;
+}
+
+const EXAMPLE_SLOT = /^(example|community)-open-\d+$/;
+const LOAD_START = 'portfolio-load.start';
+// Event ts are whole seconds, click ts are ms: the start a click caused can sort up to 999 ms before it.
+const START_BEFORE_CLICK_MS = 1000;
+
+export function openedExample(timeline: TimelineItem[]): OpenedExample | null {
+  const starts = timeline.filter((item) => flowStep(item) === LOAD_START).map((item) => item.ts);
+  let picked: TimelineItem | null = null;
+  for (const item of timeline) {
+    if (item.kind !== 'click' || !item.trackName || !EXAMPLE_SLOT.test(item.trackName)) continue;
+    if (!starts.some((ts) => ts >= item.ts - START_BEFORE_CLICK_MS)) continue;
+    if (picked === null || item.ts > picked.ts) picked = item;
+  }
+  if (picked === null || !picked.trackName) return null;
+  const slot = picked.trackName;
+  const label = picked.label?.trim() ?? '';
+  // community-open-N labels are redacted by the click beacon; N is not a stable list index.
+  const login = slot.startsWith('example-open-') && LOGIN_RE.test(label) ? label : null;
+  return { slot, login, url: login === null ? null : portfolioUrl(login) };
+}
+
 export interface RealVisitor {
   sessionId: string;
   startedAt: number;
@@ -265,6 +296,7 @@ export interface RealVisitor {
   steps: Record<string, number>;
   login: string | null;
   url: string | null;
+  openedExample: OpenedExample | null;
   burrow: BurrowReply | null;
 }
 
@@ -297,6 +329,7 @@ export function buildRealVisitors(sessions: UsageSession[], profiles: ProfileRow
         steps,
         login,
         url: login === null ? null : portfolioUrl(login),
+        openedExample: openedExample(s.timeline),
         burrow: viaBurrow ? attributeBurrow(s.startedAt, replies) : null,
       };
     });
