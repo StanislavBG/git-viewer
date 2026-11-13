@@ -10,6 +10,7 @@ import {
   formatBuiltOn,
 } from './landing.js';
 import { LOGIN_RE } from './tenant.js';
+import { resolvePersona } from './persona.js';
 
 test('isLandingMode is false when a non-empty u param is present', () => {
   assert.equal(isLandingMode('bilko.run', '?u=octocat'), false);
@@ -97,4 +98,10 @@ test('communityPortfolios is ordered newest builtOn first', () => {
 test('communityPortfolios includes bidyut10', () => {
   const entry = communityPortfolios.find((p) => p.login === 'bidyut10');
   assert.deepEqual(entry, { login: 'bidyut10', name: 'Bidyut Kundu', builtOn: '2026-11-07' });
+});
+
+test('communityPortfolios never lists a persona alias or its masked login', () => {
+  for (const p of communityPortfolios) {
+    assert.equal(resolvePersona(p.login), null, `${p.login} is a persona alias or masked login`);
+  }
 });
