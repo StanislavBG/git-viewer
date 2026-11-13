@@ -178,11 +178,17 @@ export interface ProfileRow {
   updatedAt: string | null;
 }
 
+// Rows first built before Bilko's 12:07 AM PST 2026-11-08 deploy have NULL created_at and Bilko never back-fills it, so a later updated_at is a refresh.
+export const CREATED_AT_STAMPED_MS = Date.parse('2026-11-08T08:07:00Z');
+
 function builtAtMs(p: ProfileRow): number | null {
-  const stamp = p.createdAt ?? p.updatedAt;
-  if (stamp === null) return null;
-  const ms = Date.parse(stamp);
-  return Number.isNaN(ms) ? null : ms;
+  if (p.createdAt !== null) {
+    const ms = Date.parse(p.createdAt);
+    return Number.isNaN(ms) ? null : ms;
+  }
+  if (p.updatedAt === null) return null;
+  const ms = Date.parse(p.updatedAt);
+  return Number.isNaN(ms) || ms >= CREATED_AT_STAMPED_MS ? null : ms;
 }
 
 export function matchBuildToProfile(successTs: number, profiles: ProfileRow[], toleranceMs = 120_000): ProfileRow | null {

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  CREATED_AT_STAMPED_MS,
   PACIFIC_TZ,
   attributeBurrow,
   buildRealVisitors,
@@ -404,4 +405,22 @@ test('unmatchedBuilds lists recent non-showcase builds that no real visitor acco
     unmatchedBuilds(profiles, [visitor('s1', 'newbie'), visitor('s2', null)], since).map((p) => p.login),
     ['stranger', 'legacy'],
   );
+});
+
+test('a createdAt-null row updated at or after the created_at stamping deploy is a refresh, not a build', () => {
+  const since = at('2026-11-01T00:00:00Z');
+  const refreshedAt = '2026-11-13T00:00:00Z';
+  const refreshed = profile('bidyut10', { updatedAt: refreshedAt });
+  const atCutoff = profile('torvalds', { updatedAt: iso(CREATED_AT_STAMPED_MS) });
+  const legacy = profile('legacy', { updatedAt: '2026-11-07T18:21:30Z' });
+  const fresh = profile('fresh', { createdAt: '2026-11-10T12:00:00Z', updatedAt: refreshedAt });
+  assert.equal(CREATED_AT_STAMPED_MS, Date.parse('2026-11-08T08:07:00Z'));
+  assert.deepEqual(
+    unmatchedBuilds([refreshed, atCutoff, legacy, fresh], [], since).map((p) => p.login),
+    ['legacy', 'fresh'],
+  );
+  assert.equal(matchBuildToProfile(at(refreshedAt), [refreshed]), null);
+  assert.equal(matchBuildToProfile(CREATED_AT_STAMPED_MS, [atCutoff]), null);
+  assert.equal(matchBuildToProfile(at('2026-11-07T18:21:30Z'), [refreshed, legacy])?.login, 'legacy');
+  assert.equal(matchBuildToProfile(at('2026-11-10T12:00:00Z'), [refreshed, fresh])?.login, 'fresh');
 });
