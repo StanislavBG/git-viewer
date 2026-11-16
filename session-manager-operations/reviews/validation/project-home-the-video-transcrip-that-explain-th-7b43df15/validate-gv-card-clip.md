@@ -28,7 +28,7 @@ Gates re-run at HEAD: `CI=1 pnpm test` exit 0 (all suites pass, lib import check
 - Nothing in the video cites content/writing/. (Not committed, as the PRD required: the folder is gitignored.)
 
 ## card-clip-render-declare — VERIFIED
-- share/tile.mp4 4,997,397 B (<8,388,608); ffprobe: h264 1200x630 yuv420p, aac, both 60.0 s. tests/tile-clip.test.ts passes in `pnpm test`.
+- share/tile.mp4 4,997,397 B (<8,388,608); ffprobe: h264 1200x630 yuv420p, aac, both 60.0 s. scripts/tile-clip.test.ts passes in `pnpm test`.
 - package.json build:bilko: `... rm -f ... && cp share/tile.mp4 dist/tile.mp4 && node scripts/emit-manifest.mjs`; `build` unchanged.
 - bilko.listing.json adds only `"video": "/projects/git-viewer/tile.mp4"` after shareImage; listing.test.ts asserts it. Build prints `share assets not counted: ... tile.mp4`; counted 75.8 KB gz < 200.
 - CLAUDE.md Deploy lane 2 has the card:clip sentence.
