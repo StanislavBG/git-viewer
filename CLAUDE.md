@@ -1,12 +1,12 @@
 # git-viewer
 
-Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, heatmap-centric, with a local data pipeline that walks your repos and emits a single `data.json` the page reads at boot.
+Personal GitHub portfolio dashboard for github.com/StanislavBG. Editorial-dark, heatmap-centric, with a data pipeline that pulls the account's public repos from the GitHub API and rebuilds the page from a single JSON file (`data.json`, read at boot).
 
 ## Layout
 - `src/` — Vite + React 18 + TS dashboard. Reads `public/data.json` once via `data/loader.tsx`, hands it to components through `useGitData()`. Four-tab nav (Overview / Projects / Activity / Writing) routed by URL hash via `state/route.ts`.
 - `pipeline/` — Node CLI (`pnpm sync`) using Octokit. Hits the GitHub REST + GraphQL APIs, writes `public/data.json`.
 - `public/` — `data.json` (committed; sync overwrites) + `data.sample.json` (fixture for forkers, never overwritten).
-- `content/writing/` — markdown essays with YAML frontmatter (title, deck, date, read, words, tag, featured, pulls, relatedProjects). `_now.md` drives the Writing tab's "now reading / writing / thinking" panel. Pipeline reads at sync time.
+- `content/writing/` — empty by default, so the Writing tab shows "no essays yet". Markdown essays with YAML frontmatter (title, deck, date, read, words, tag, featured, pulls, relatedProjects), plus an optional `_now.md` that drives the Writing tab's "now reading / writing / thinking" panel, are read at sync time.
 - `docs/prds/` — numbered feature PRDs (`01`..`08`); `README.md` is the index/status.
 - `.github/workflows/pages.yml` — runs `sync && build && deploy-pages` on push and on a daily 09:00-UTC cron.
 

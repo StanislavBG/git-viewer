@@ -1,8 +1,8 @@
 # git-viewer
 
 A personal GitHub portfolio dashboard. Editorial-dark, heatmap-centric, with a
-local data pipeline that scans your repos and rebuilds the page from a single
-JSON file.
+data pipeline that pulls the account's public repos from the GitHub API and
+rebuilds the page from a single JSON file.
 
 Live: <https://stanislavbg.github.io/git-viewer/> · <https://bilko.run/projects/git-viewer/>
 
