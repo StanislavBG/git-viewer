@@ -12,6 +12,8 @@ const { listing } = JSON.parse(
     detail: string;
     talkingPoints: string[];
     avoidClaims: string[];
+    shareImage: string;
+    video: string;
   };
 };
 
@@ -64,4 +66,9 @@ test('UI price copy has no $5/mo', () => {
     assert.ok(!src.includes('$5/mo'), f);
     assert.ok(!src.includes('per month'), f);
   }
+});
+
+test('listing declares the card clip and keeps the share image', () => {
+  assert.equal(listing.video, '/projects/git-viewer/tile.mp4');
+  assert.equal(listing.shareImage, '/projects/git-viewer/og.png');
 });

@@ -22,6 +22,7 @@
       "Needs access to your GitHub account or a token from you",
       "Fully free with no paid tier"
     ],
-    "shareImage": "/projects/git-viewer/og.png"
+    "shareImage": "/projects/git-viewer/og.png",
+    "video": "/projects/git-viewer/tile.mp4"
   }
 }
